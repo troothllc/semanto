@@ -1,0 +1,15 @@
+# Semanto by Trooth for Cloudflare
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/troothllc/semanto/tree/main/deploy/cloudflare)
+
+A Worker on your Cloudflare zone. When an AI agent asks for a page, it answers with the signed copy Trooth holds for you. Every other request goes to your site as before. If Trooth is slow or down, your site keeps answering.
+
+1. Press **Deploy to Cloudflare**, paste your Trooth ID into **TROOTH_ID**, leave everything else as it is, and press **Deploy**.
+2. When it finishes, open the Worker's **Settings**, then **Domains & Routes**, then **Add**, then **Route**. Pick your domain as the zone, type your domain followed by `/*` as the route, then press **Add route**. On the Workers Free plan, set the route to fail open, so your site keeps answering if the day's request limit is reached.
+3. In Trooth, press **Check my site**.
+
+If the build stops at *could not push contents of source repo to destination repo*, your GitHub organization blocks force pushes on every repository: add the **Cloudflare Workers and Pages** app to that rule's bypass list, then press **Retry build**.
+
+The full guide: https://trooth.co/docs/semanto/install/cloudflare-worker
+
+Built by Trooth from its adapter sources. You may run and change this copy to serve Semanto for domains you control; LICENSE.md says what else it permits.

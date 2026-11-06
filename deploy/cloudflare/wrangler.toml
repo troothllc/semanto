@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: LicenseRef-Trooth-Adapter
+# Copyright (c) 2026 Trooth, LLC
+#
+# Built by Trooth. Do not edit here.
+# The Deploy to Cloudflare button asks for TROOTH_ID. After it deploys, add a route for
+# your domain under the Worker's Settings, Domains & Routes (Add, Route). Until TROOTH_ID is set, every
+# request goes to your site unchanged.
+
+name = "trooth-semanto"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+workers_dev = false
+preview_urls = false
+
+# One value to fill in on Cloudflare's Deploy page: the Trooth ID. The API address and the mode have defaults in the
+# code, so the page asks for nothing else.
+[vars]
+TROOTH_ID = ""
+
+[observability]
+enabled = true
