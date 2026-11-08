@@ -2,7 +2,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/trooth.svg?label=pypi)](https://pypi.org/project/trooth/)
 
-Semanto turns a company's website into one signed copy that AI agents can read and check. Each page carries a signature from the company's own key, and every published version is entered in a public log, so anyone can confirm what a company said and when it said it.
+Semanto makes AI answers about your company more accurate. It turns a company's website into one signed copy that AI agents can read and check. Each page carries a signature from the company's own key, and every published version is entered in a public log, so anyone can confirm what a company said and when it said it.
 
 This repository holds the open readers for Python, JavaScript and Go with their shared test vectors, and the Cloudflare adapter a company deploys on its own domain. The Semanto service itself is Trooth's and is not here.
 
