@@ -130,3 +130,23 @@ export function answer(file, company, input, marks = new Map(), ctx = {}) {
   lines.push(`Check: ${check}`);
   return { ...base, status: "answer", matched_by: by, facts: [asAnswered(f, mark)], text: lines.slice(0, 3).join("\n") };
 }
+
+/**
+ * What the customer is shown, built by code from an answer; a model's own wording is never part of it.
+ *
+ * For a value answer the first line is the signed sentence exactly as signed, then its conditions if any, then the day
+ * it was signed and the check link. A marked fact shows its mark instead of a value. Candidates, the not-published
+ * reply and not_read show the answer's own fixed line. `draft` (what a model wrote) is accepted so a caller can pass
+ * it, and is discarded: `discarded` says whether one was given.
+ * @param {ReturnType<typeof answer>} a
+ * @param {string} [draft]
+ */
+export function assembleReply(a, draft) {
+  const discarded = typeof draft === "string" && draft.length > 0;
+  const signed_on = a.signed_at ? String(a.signed_at).slice(0, 10) : null;
+  const f = a.status === "answer" ? a.facts[0] : null;
+  if (!f) return { status: a.status, fact_id: null, statement: null, signed_on, check: a.check ?? null, text: a.text, discarded };
+  const tail = `${signed_on ? `Signed on ${signed_on}. ` : ""}Check: ${a.check}`;
+  const lines = f.mark ? [MARK_WORDS[f.mark], tail] : [f.statement, ...(f.conditions.length ? [`Conditions: ${f.conditions.join("; ")}.`] : []), tail];
+  return { status: a.status, fact_id: f.fact_id, statement: f.statement, signed_on, check: a.check, text: lines.join("\n"), discarded };
+}

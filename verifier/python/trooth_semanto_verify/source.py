@@ -28,7 +28,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 from .answer import answer as _answer
-from .answer import fact_marks
+from .answer import assemble_reply, fact_marks
 from .client import Fetch, urllib_fetch
 from .verify import verify_semanto
 
@@ -152,3 +152,7 @@ class SemantoSource:
             return {"object": "semanto.answer", "status": "not_read", "matched_by": None, "company": {"trooth_id": None, "name": None, "domain": self.domain},
                     "version": None, "facts": [], "text": f"No signed record of {self.domain} could be read and checked yet."}
         return _answer(self.file, self.company, fact_id=fact_id, question=question, marks=self.marks(), check_base=f"{self.api_base}/public/semanto")
+
+    def reply(self, fact_id: Optional[str] = None, question: Optional[str] = None, draft: Optional[str] = None) -> dict:
+        """The reply a chatbot shows for a question: built by code from the signed record, with the model's draft discarded."""
+        return assemble_reply(self.answer(fact_id=fact_id, question=question), draft)

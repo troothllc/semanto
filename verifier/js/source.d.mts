@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 Trooth, LLC
 
-import type { Answer, FactMark } from "./answer.mjs";
+import type { Answer, AssembledReply, FactMark } from "./answer.mjs";
 
 export const TROOTH_API: string;
 export const MAX_REFRESH_SECONDS: 900;
@@ -25,4 +25,6 @@ export class SemantoSource {
   ensureFresh(): Promise<void>;
   marks(): Map<string, FactMark>;
   answer(input: { fact_id?: string; question?: string }): Promise<Answer>;
+  /** The reply a chatbot shows, built by code; the model's draft is discarded. */
+  reply(input: { fact_id?: string; question?: string; draft?: string }): Promise<AssembledReply>;
 }

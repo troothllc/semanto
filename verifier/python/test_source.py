@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 from trooth import SemantoSource
-from trooth_semanto_verify.answer import MATCHER, answer, fact_marks, matcher_id
+from trooth_semanto_verify.answer import MATCHER, answer, assemble_reply, fact_marks, matcher_id
 from trooth_semanto_verify.source import MAX_REFRESH_SECONDS
 
 T = Path(__file__).resolve().parent.parent / "test-vectors"
@@ -141,3 +141,38 @@ def test_marked_fact_returns_mark_and_no_value():
     net.marks = [{"fact_id": fid, "mark": "changed_since_signing"}]
     a = SemantoSource("acme.com", fetch=net, now=Clock()).answer(fact_id=fid)
     assert a["facts"][0]["mark"] == "changed_since_signing" and a["facts"][0]["statement"] is None and "49" not in a["text"]
+
+
+def test_1000_replayed_value_questions_show_the_signed_sentence_byte_for_byte():
+    v = read("answer-v1/answers.json")
+    marks = fact_marks(v["file"], v["stored_marks"]["changed"], datetime.fromisoformat(v["now"].replace("Z", "+00:00")))
+    by_id = {f["id"]: f for f in v["file"]["facts"]}
+    pre = ["", "Tell me: ", "Quick question, ", "Is it true that ", "Can you confirm ", "I read that ", "Please check: ", "Hi! ", "So ", "Remind me, "]
+    post = ["", "?", ".", " right?", " please", "!!"]
+    cases = [lambda s: s, str.lower, str.upper]
+    shown = marked = 0
+    for f in v["file"]["facts"]:
+        for p in pre:
+            for q in post:
+                for c in cases:
+                    draft = "Sure! " + f["statement"] + " (the model's own wording)"
+                    r = assemble_reply(answer(v["file"], v["company"], question=c(p + f["statement"] + q), marks=marks, check_base=v["check_base"]), draft)
+                    assert r["discarded"] and "model's own wording" not in r["text"]
+                    if r["status"] != "answer":
+                        continue
+                    fact = by_id[r["fact_id"]]
+                    if fact["id"] in marks:
+                        marked += 1
+                        assert r["statement"] is None and fact["statement"] not in r["text"]
+                        continue
+                    assert r["text"].split("\n")[0].encode() == fact["statement"].encode()
+                    shown += 1
+    assert shown >= 1000 and marked > 0
+
+
+def test_reply_discards_the_draft():
+    s = SemantoSource("acme.com", fetch=Net(), now=Clock())
+    r = s.reply(question="What does the Starter plan cost?", draft="It is 19 USD a month.")
+    assert r["text"].split("\n")[0] == "The Starter plan costs 49 USD a month for up to 5 seats."
+    assert r["discarded"] and "19 USD" not in r["text"]
+    assert s.reply(question="What is the weather?", draft="Sunny.")["status"] == "not_published"
