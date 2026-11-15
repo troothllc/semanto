@@ -14,7 +14,7 @@
 //   const r = await client.read("https://acme.com/pricing");
 //   if (r.ok) use(r.text); else console.log(r.reason, r.checks);
 
-import { parseDnsKeyRecords, verifyResponse, fromUtf8 } from "./verify.mjs";
+import { parseDnsKeyRecords, verifyResponse, fromUtf8, trimEnd } from "./verify.mjs";
 
 export const TROOTH_API = "https://api.trooth.co";
 export const DOH_ENDPOINT = "https://cloudflare-dns.com/dns-query";
@@ -25,7 +25,7 @@ export class SemantoClient {
    */
   constructor(opts = {}) {
     this.fetch = opts.fetch ?? globalThis.fetch.bind(globalThis);
-    this.apiBase = (opts.apiBase ?? TROOTH_API).replace(/\/+$/, "");
+    this.apiBase = trimEnd(opts.apiBase ?? TROOTH_API, "/");
     this.doh = opts.doh === undefined ? DOH_ENDPOINT : opts.doh;
     this.cacheMs = (opts.cacheSeconds ?? 300) * 1000;
     this.now = opts.now ?? (() => Date.now());

@@ -88,8 +88,13 @@ function printChecks(title, result) {
   return result.ok;
 }
 
+/** GET a public JSON document. Only https URLs (and http on this machine, for a local test server) are fetched, and
+ *  nothing but an Accept header is sent: no credentials and no file contents leave with the request. */
 async function fetchJson(url) {
-  const r = await fetch(url, { headers: { Accept: "application/json" } });
+  const u = new URL(url);
+  const local = u.protocol === "http:" && (u.hostname === "localhost" || u.hostname === "127.0.0.1" || u.hostname === "[::1]");
+  if (u.protocol !== "https:" && !local) throw new Error(`${u.protocol} is not fetched; only https`);
+  const r = await fetch(u.href, { headers: { Accept: "application/json" }, credentials: "omit" });
   if (!r.ok) throw new Error(`${url} answered ${r.status}`);
   return r.json();
 }

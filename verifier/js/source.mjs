@@ -18,7 +18,15 @@
 // itself, and logs a "trooth_api_unreachable" event. A new version is adopted only when it checks out; until then the
 // last good one stays in use and the failure is logged. No dependencies; runs wherever fetch and WebCrypto do.
 
-import { verifySemanto } from "./verify.mjs";
+import { trimEnd, verifySemanto } from "./verify.mjs";
+
+/** "acme.com" from "acme.com", "https://acme.com/" or "acme.com/path"; no regex on the caller's string. */
+function hostOf(domain) {
+  let d = String(domain).toLowerCase();
+  for (const p of ["https://", "http://"]) if (d.startsWith(p)) d = d.slice(p.length);
+  const slash = d.indexOf("/");
+  return slash < 0 ? d : d.slice(0, slash);
+}
 import { answer as answerFrom, assembleReply, factMarks, MARK_WORDS } from "./answer.mjs";
 
 export const TROOTH_API = "https://api.trooth.co";
@@ -32,9 +40,9 @@ export class SemantoSource {
    * @param {{ fetch?: typeof fetch, apiBase?: string, refreshSeconds?: number, timeoutMs?: number, now?: () => number, onEvent?: (e: object) => void }} [opts]
    */
   constructor(domain, opts = {}) {
-    this.domain = String(domain).toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+    this.domain = hostOf(domain);
     this.fetch = opts.fetch ?? globalThis.fetch.bind(globalThis);
-    this.apiBase = (opts.apiBase ?? TROOTH_API).replace(/\/+$/, "");
+    this.apiBase = trimEnd(opts.apiBase ?? TROOTH_API, "/");
     this.refreshMs = Math.min(Math.max(opts.refreshSeconds ?? MAX_REFRESH_SECONDS, 1), MAX_REFRESH_SECONDS) * 1000;
     this.timeoutMs = opts.timeoutMs ?? 5000;
     this.now = opts.now ?? (() => Date.now());
