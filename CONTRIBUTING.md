@@ -39,7 +39,7 @@ Maintainers release from this repository: a tag `js-v<version>`, `python-v<versi
 CI and the releases install exactly what is locked, so a compromised upstream release cannot slip in:
 
 - Python: `verifier/python/requirements-ci.txt`, with hashes, made from `requirements-ci.in` and `pyproject.toml` by the `uv pip compile` line at the top of `requirements-ci.in`, installed with `pip install --require-hashes`; the tests run the package from source (`PYTHONPATH=.`), so nothing unlocked is installed.
-- npm: the CLI the release publishes with is `.github/npm-cli`, installed with `npm ci`.
+- npm: the release publishes with the npm that Node 26 ships (11.20 or later), so no separate npm is installed.
 - Actions: every `uses:` names a full commit, with its version in a comment.
 
 Dependabot proposes each update as a pull request.

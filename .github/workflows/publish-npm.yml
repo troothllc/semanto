@@ -40,11 +40,12 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: 26
           registry-url: "https://registry.npmjs.org"
-      - name: npm 11.15.0 or later (staged publishing needs it), from a lockfile
-        working-directory: .github/npm-cli
-        run: npm ci --no-audit --no-fund && echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
+      - name: npm 11.15.0 or later (staged publishing needs it), the one Node 26 ships
+        run: |
+          v=$(npm --version)
+          node -e 'const [a,b]=process.argv[1].split(".").map(Number);process.exit(a>11||(a===11&&b>=15)?0:1)' "$v" || { echo "::error::npm $v is older than 11.15.0"; exit 1; }
       - name: The tag is the package version
         run: |
           V="$(node -p "require('./package.json').version")"
