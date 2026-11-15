@@ -1,0 +1,66 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 Trooth, LLC
+#
+# Publishes @trooth/semanto-verify (verifier/js) to npm on a tag js-v<version>, by npm trusted publishing (OIDC: no
+# token is stored), with npm provenance, a cosign keyless signature and GitHub build provenance on the release files.
+name: Publish @trooth/semanto-verify
+
+on:
+  push:
+    tags: ["js-v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-npm
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Test, then publish ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@trooth/semanto-verify
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    defaults:
+      run:
+        working-directory: verifier/js
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          registry-url: "https://registry.npmjs.org"
+      - name: npm 11.5.1 or later (trusted publishing needs it)
+        run: npm install -g npm@^11.5.1
+      - name: The tag is the package version
+        run: |
+          V="$(node -p "require('./package.json').version")"
+          [ "js-v$V" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME does not match package.json version $V"; exit 1; }
+      - name: Test against the shared vectors
+        run: node --test test/vectors.test.mjs
+      - name: Pack once; this file is the one published and signed
+        run: mkdir -p ../../release && npm pack --pack-destination ../../release
+      - name: Publish with provenance
+        run: npm publish ../../release/trooth-semanto-verify-*.tgz --provenance --access public
+      - uses: sigstore/cosign-installer@v3
+      - name: Checksums and a keyless signature for each release file
+        working-directory: release
+        run: |
+          sha256sum trooth-semanto-verify-*.tgz > SHA256SUMS
+          for f in trooth-semanto-verify-*.tgz SHA256SUMS; do cosign sign-blob --yes --bundle "$f.sigstore.json" "$f"; done
+      - uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: release/trooth-semanto-verify-*.tgz
+      - name: The GitHub release for this tag
+        working-directory: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" * --repo "$GITHUB_REPOSITORY" --verify-tag --title "@trooth/semanto-verify ${GITHUB_REF_NAME#js-v}" --generate-notes

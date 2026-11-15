@@ -7,7 +7,7 @@ Shared test vectors for every Semanto verifier (JavaScript, Python, Go, and anyo
 
 Everything here is a fixture. Acme Inc and acme.com are fictional. The keys are fixture keys made for these files; Trooth's production witness key is not among them. No number in any file is a measurement. Every date is fixed to 2026-10-22T12:00:00Z and every check is judged at `now` = 2026-10-22T12:00:10Z, so the files are byte-stable: `npx tsx verifier/test-vectors/generate.ts` writes the same bytes on every run.
 
-The formats are specified in `docs/spec/semanto-file.md`, `docs/spec/response-signatures.md` and `docs/spec/log.md`.
+The formats are described at [trooth.co/docs/semanto](https://trooth.co/docs/semanto).
 
 ## Files and what a verifier must conclude
 
@@ -58,14 +58,14 @@ Verifiers report the first failing check with one of these codes, so three langu
 
 ## States
 
-`stateOf` answers in the ledger's words (src/ledger/revocation.ts): `current`, `superseded` (a newer version is known), `behind` (before `not_before`), `expired` (at or after `not_after`), `withdrawn` (header state withdrawn or named on a revocation list at or before now), `unsigned` (read, confirmed, or signed state without a signature).
+`stateOf` answers in the ledger's words: `current`, `superseded` (a newer version is known), `behind` (before `not_before`), `expired` (at or after `not_after`), `withdrawn` (header state withdrawn or named on a revocation list at or before now), `unsigned` (read, confirmed, or signed state without a signature).
 
 ## How to run them
 
-- JavaScript: `npx vitest run test/verifier.test.ts`, or `node verifier/js/cli.mjs file verifier/test-vectors/v1/semanto.json --pages verifier/test-vectors/v1/pages`
+- JavaScript: `node --test verifier/js/test/vectors.test.mjs`, or `node verifier/js/cli.mjs file verifier/test-vectors/v1/semanto.json --pages verifier/test-vectors/v1/pages`
 - Python: `cd verifier/python && python3 -m pytest`
 - Go: `cd verifier/go && go test ./semanto/`
 
 ## Regenerating
 
-`npx tsx verifier/test-vectors/generate.ts`. The generator reads the fixture keys in `test/fixtures/verifier/` and writes this folder. If a format changes, bump the folder to `v2` and keep `v1` so older verifiers keep their tests.
+Trooth generates these files deterministically from fixture keys, with every date fixed, so a run writes the same bytes. If a format changes, the folder becomes `v2` and `v1` stays, so older verifiers keep their tests.

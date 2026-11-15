@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 Trooth, LLC
+#
+# The Go module is released by its tag, verifier/go/v<version>, which the Go module proxy serves as soon as the tag
+# exists. This workflow tests the tagged code, asks the proxy for the version so pkg.go.dev lists it, and makes the
+# GitHub release.
+name: Release the Go verifier
+
+on:
+  push:
+    tags: ["verifier/go/v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+      - name: Test the tagged code
+        working-directory: verifier/go
+        run: go vet ./... && go test ./...
+      - name: Ask the Go module proxy for this version
+        run: |
+          V="${GITHUB_REF_NAME#verifier/go/}"
+          curl -fsS "https://proxy.golang.org/github.com/troothllc/semanto/verifier/go/@v/${V}.info"
+      - name: The GitHub release for this tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag --title "Go verifier ${GITHUB_REF_NAME#verifier/go/}" --generate-notes

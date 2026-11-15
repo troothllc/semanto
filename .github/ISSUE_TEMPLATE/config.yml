@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a vulnerability
+    url: https://github.com/troothllc/semanto/security/advisories/new
+    about: Privately. Never in a public issue.
+  - name: Semanto docs
+    url: https://trooth.co/docs/semanto
+    about: How Semanto works, the formats and the API.

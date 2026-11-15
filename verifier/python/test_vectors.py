@@ -64,6 +64,9 @@ def run(v: dict) -> dict:
         return {"ok": ok, "reason": None if ok else "log_check_failed"}
     if kind == "pages":
         return {"ok": True}
+    if kind == "page-bytes":
+        # the bytes are checked against the signed hash; what the text says changes nothing.
+        return {"ok": V.digest(v["markdown"].encode("utf-8")) == v["hash"]}
     raise AssertionError(f"unknown vector kind {kind}")
 
 
@@ -169,7 +172,7 @@ def test_jws_types_include_every_core_type() -> None:
     # The kit's registry names every JWS type Semanto signs, marketplaceCatalog and sellerList included.
     assert V.JWS_TYPES["marketplaceCatalog"] == "https://trooth.co/types/marketplace-catalog"
     assert V.JWS_TYPES["sellerList"] == "https://trooth.co/types/seller-list"
-    assert len(V.JWS_TYPES) == 14
+    assert len(V.JWS_TYPES) == 16
 
 
 def test_web_bot_auth_refuses_a_second_label() -> None:

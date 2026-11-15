@@ -34,6 +34,8 @@
     "negative/web-bot-auth-two-labels.json",
     "negative/response-created-not-integer.json",
     "negative/jws-bad-nbf.json",
-    "negative/jws-header-null.json"
+    "negative/jws-header-null.json",
+    "response-header-expired.json",
+    "page-with-instruction.json"
   ]
 }

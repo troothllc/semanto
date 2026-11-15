@@ -3,7 +3,7 @@
 #
 # The top-level Semanto checks: a whole file offline, a per-page proof, a
 # signed response, tree heads, log inclusion and consistency, checkpoints,
-# offers, revocation lists, and the state of a version at an instant. Every
+# offers, revocation lists, and the state of a version at a given time. Every
 # function returns plain dicts: {"ok", "reason", "checks": [{"name", "ok",
 # "detail"}]} so a CLI prints exactly what was checked, in plain words. Nothing
 # here produces a number or a verdict about a company.
@@ -212,7 +212,7 @@ def _as_bytes(b: Union[bytes, bytearray, str]) -> bytes:
 
 
 def verify_semanto(file: dict, page_bytes_by_url: PageBytes = None, keys: Any = None, now: Now = None, revocations: Optional[dict] = None, latest: Optional[int] = None) -> dict:
-    """Verify a whole Semanto file offline. See docs/spec/semanto-file.md.
+    """Verify a whole Semanto file offline. The format is described at https://trooth.co/docs/semanto.
 
     keys: {"company": <JWK Set>, "trooth": <JWK Set>}. The company signature resolves only against the company's set,
     the witness statement only against Trooth's. A plain JWK Set is the company's, and then no witness checks out.
@@ -400,7 +400,15 @@ def verify_response(status: int, headers: Dict[str, Any], body: Union[bytes, str
     dg = verify_content_digest(header_get(headers, "content-digest"), b)
     c.add("content_digest", dg, "Content-Digest matches the body." if dg else "Content-Digest does not match the body, or is missing.", "content_digest_mismatch")
     v = verify_message({"kind": "response", "status": status, "headers": headers}, role_resolver(keys, role), required=required or SEMANTO_RESPONSE_COMPONENTS, tag=tag, now=now_sec, max_age_seconds=max_age_seconds)
-    c.add("signature", v["ok"], f"The response is signed by the {who} key {v['keyid']} with tag {v['params'].get('tag')}, covering {', '.join(v['components'])}." if v["ok"] else f"The response signature did not check out against the {who} keys: {v['reason']}.", None if v["ok"] else v["reason"])
+    # a cached copy past its signature's lifetime keeps reason "expired" and says in state whether the signature
+    # checked out while it was valid.
+    stale = False
+    if not v["ok"] and v.get("reason") == "expired":
+        exps = [e["params"].get("expires") for e in parse_signature_input(header_get(headers, "signature-input") or "").values() if isinstance(e["params"].get("expires"), int)]
+        if exps:
+            again = verify_message({"kind": "response", "status": status, "headers": headers}, role_resolver(keys, role), required=required or SEMANTO_RESPONSE_COMPONENTS, tag=tag, now=max(exps) - 1)
+            stale = bool(again["ok"])
+    c.add("signature", v["ok"], (f"The response is signed by the {who} key {v['keyid']} with tag {v['params'].get('tag')}, covering {', '.join(v['components'])}." + "") if v["ok"] else ("The response signature checked out while it was valid and its lifetime has ended: a cached copy, valid with an expired header signature." if stale else None) or f"The response signature did not check out against the {who} keys: {v['reason']}.", None if v["ok"] else v["reason"])
     if v["ok"]:
         for n in v.get("notes", []):
             c.note(f"Response signature: {n}.")
@@ -413,7 +421,8 @@ def verify_response(status: int, headers: Dict[str, Any], body: Union[bytes, str
     page_hash = header_get(headers, "trooth-page-hash")
     d = digest(b)
     c.add("page_hash", page_hash == d, f"Trooth-Page-Hash is the digest of the body: {d}" if page_hash == d else (f"Trooth-Page-Hash {page_hash} is not the digest of the body ({d})." if page_hash else "The response carries no Trooth-Page-Hash."), "page_hash_mismatch")
-    return c.result(keyid=v.get("keyid") if v["ok"] else None, params=v.get("params") if v["ok"] else None, signed_by=role, version=header_get(headers, "trooth-semanto-version"), page_hash=page_hash, signed_page_hash=header_get(headers, "trooth-signed-page-hash"))
+    extra = {"state": "valid_header_signature_expired"} if stale else {}
+    return c.result(keyid=v.get("keyid") if v["ok"] else None, params=v.get("params") if v["ok"] else None, signed_by=role, version=header_get(headers, "trooth-semanto-version"), page_hash=page_hash, signed_page_hash=header_get(headers, "trooth-signed-page-hash"), **extra)
 
 
 def verify_web_bot_auth_request(method: str, url: str, headers: Dict[str, Any], keys: Any = None, now: Now = None, max_age_seconds: Optional[int] = None) -> dict:

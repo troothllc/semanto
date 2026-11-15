@@ -8,6 +8,7 @@ This repository holds the parts of Semanto by Trooth that are published on purpo
 | --- | --- |
 | `verifier/` | Apache License 2.0 ([`verifier/LICENSE`](verifier/LICENSE)). The open readers for Python, JavaScript and Go, and the shared test vectors. |
 | `deploy/cloudflare/` | Trooth Adapter License 1.0 ([`deploy/cloudflare/LICENSE.md`](deploy/cloudflare/LICENSE.md)). The adapter a customer deploys to serve Semanto on their own domain. |
+| `action.yml`, `.github/`, `test/` and the repository's own documents | Apache License 2.0 ([`verifier/LICENSE`](verifier/LICENSE)). The deploy Action, the workflows that test and publish the readers, and the fixtures. |
 | Everything else | All rights reserved by Trooth, LLC. |
 
 The Semanto service, its Worker, its dashboard and its build pipeline are proprietary to Trooth, LLC and are not in this repository.

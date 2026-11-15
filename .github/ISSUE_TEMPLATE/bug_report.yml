@@ -1,0 +1,26 @@
+name: Bug report
+description: A verifier concludes something it should not, or fails to run.
+labels: [bug]
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package
+      options: ["@trooth/semanto-verify (JavaScript)", "trooth (Python)", "verifier/go (Go)", "Test vectors", "Semanto on deploy action"]
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Version
+    validations: { required: true }
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations: { required: true }
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: The command or code, and the URL or file it checked. Remove anything secret.
+    validations: { required: true }
