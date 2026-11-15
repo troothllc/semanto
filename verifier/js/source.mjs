@@ -23,7 +23,7 @@ import { answer as answerFrom, assembleReply, factMarks, MARK_WORDS } from "./an
 
 export const TROOTH_API = "https://api.trooth.co";
 export const MAX_REFRESH_SECONDS = 900;
-/** The answer modes a company chooses on trooth.co (AP24). */
+/** The answer modes a company chooses on trooth.co. */
 export const ANSWER_MODES = ["checked", "source_only", "audit"];
 
 export class SemantoSource {

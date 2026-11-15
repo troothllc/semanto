@@ -35,7 +35,7 @@ from .verify import verify_semanto
 
 TROOTH_API = "https://api.trooth.co"
 MAX_REFRESH_SECONDS = 900
-# The answer modes a company chooses on trooth.co (AP24).
+# The answer modes a company chooses on trooth.co.
 ANSWER_MODES = ("checked", "source_only", "audit")
 
 
