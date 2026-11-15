@@ -52,4 +52,11 @@ const a = await acme.answer({ question: "How much is the Starter plan?" });
 // a.status: "answer" | "candidates" | "not_published" | "not_read"; a.text is the signed sentence and the check link
 ```
 
+For a chatbot, `reply` builds the text the customer sees by code and discards the model's draft: the signed sentence exactly as signed, its conditions, the day it was signed and the check link.
+
+```js
+const r = await acme.reply({ question: userQuestion, draft: modelText });
+show(r.text); // r.statement is the signed sentence; r.discarded says a draft was dropped
+```
+
 Trooth's API is used only for Trooth's witness keys and the monitor's marks. When it cannot be reached, answers keep coming from the last version that checked out and the source logs `trooth_api_unreachable`. A new version that does not check out is refused (`version_refused`) and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.

@@ -170,3 +170,20 @@ def answer(file: dict, company: dict, fact_id: Optional[str] = None, question: O
     lines = [MARK_WORDS[mark]] if mark else [f["statement"], *([f"Conditions: {'; '.join(f['conditions'])}."] if f.get("conditions") else [])]
     lines.append(f"Check: {check}")
     return {**base, "status": "answer", "matched_by": by, "facts": [_as_answered(f, mark)], "text": "\n".join(lines[:3])}
+
+
+def assemble_reply(a: dict, draft: Optional[str] = None) -> dict:
+    """What the customer is shown, built by code from an answer; a model's own wording is never part of it.
+
+    For a value answer the first line is the signed sentence exactly as signed, then its conditions if any, then the day
+    it was signed and the check link. A marked fact shows its mark instead of a value. Candidates, the not-published
+    reply and not_read show the answer's own fixed line. `draft` (what a model wrote) is accepted and discarded:
+    `discarded` says whether one was given."""
+    discarded = isinstance(draft, str) and len(draft) > 0
+    signed_on = str(a["signed_at"])[:10] if a.get("signed_at") else None
+    f = a["facts"][0] if a["status"] == "answer" else None
+    if not f:
+        return {"status": a["status"], "fact_id": None, "statement": None, "signed_on": signed_on, "check": a.get("check"), "text": a["text"], "discarded": discarded}
+    tail = f"{f'Signed on {signed_on}. ' if signed_on else ''}Check: {a['check']}"
+    lines = [MARK_WORDS[f["mark"]], tail] if f["mark"] else [f["statement"], *([f"Conditions: {'; '.join(f['conditions'])}."] if f["conditions"] else []), tail]
+    return {"status": a["status"], "fact_id": f["fact_id"], "statement": f["statement"], "signed_on": signed_on, "check": a["check"], "text": "\n".join(lines), "discarded": discarded}

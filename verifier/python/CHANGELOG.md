@@ -5,6 +5,10 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 0.3.0 (2026-11-15)
+
+- `assemble_reply(answer, draft)` and `SemantoSource.reply(question=..., draft=...)` build what the customer is shown by code: for a value answer the signed sentence exactly as signed, its conditions, the day it was signed and the check link. A model's draft is discarded and never appears. A marked fact shows its mark and no value. 1,000 replayed value questions show the signed sentence byte for byte.
+
 ## 0.2.0 (2026-11-15)
 
 - `SemantoSource` (`from trooth import SemantoSource`): loads a company's signed copy from its own site (`/.well-known/trooth.semanto` and its keys), checks it once for each new body, reads it again at most every 15 minutes, and answers fact IDs and plain questions in process. When Trooth's API cannot be reached it keeps answering from the last version that checked out and logs a `trooth_api_unreachable` event; a new version that does not check out is refused and logged, and the last good one stays in use.

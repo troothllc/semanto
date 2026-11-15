@@ -41,3 +41,17 @@ export function notPublished(org: string, domain: string): string;
 export function matcherId(m?: typeof MATCHER): string;
 export function factMarks(file: object, changed?: string[], now?: Date): Map<string, FactMark>;
 export function answer(file: object, company: { trooth_id: string; org: string; domain: string }, input: { fact_id?: string; question?: string }, marks?: Map<string, FactMark>, ctx?: { checkBase?: string; signed_at?: string | null }): Answer;
+
+export interface AssembledReply {
+  status: AnswerStatus;
+  fact_id: string | null;
+  /** The signed sentence exactly as signed; null when there is no single fact or it carries a mark. */
+  statement: string | null;
+  signed_on: string | null;
+  check: string | null;
+  /** What the customer is shown; its first line is the signed sentence for a value answer. */
+  text: string;
+  /** Whether a model's draft was given; it is never part of `text`. */
+  discarded: boolean;
+}
+export function assembleReply(a: Answer, draft?: string): AssembledReply;

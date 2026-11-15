@@ -10,7 +10,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { answer, factMarks, MATCHER, matcherId } from "../answer.mjs";
+import { answer, assembleReply, factMarks, MATCHER, matcherId } from "../answer.mjs";
 import { SemantoSource, MAX_REFRESH_SECONDS } from "../source.mjs";
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "test-vectors");
@@ -154,4 +154,48 @@ test("a fact the monitor marked changed returns its mark and no value", async ()
   assert.equal(a.facts[0].mark, "changed_since_signing");
   assert.equal(a.facts[0].statement, null);
   assert.doesNotMatch(a.text, /49/);
+});
+
+test("1,000 replayed value questions show the signed sentence byte for byte and never the model's draft", () => {
+  const v = readJson("answer-v1/answers.json");
+  const marks = factMarks(v.file, v.stored_marks.changed, new Date(v.now));
+  const byId = new Map(v.file.facts.map((f) => [f.id, f]));
+  const pre = ["", "Tell me: ", "Quick question, ", "Is it true that ", "Can you confirm ", "I read that ", "Please check: ", "Hi! ", "So ", "Remind me, "];
+  const post = ["", "?", ".", " right?", " please", "!!"];
+  const cases = [(s) => s, (s) => s.toLowerCase(), (s) => s.toUpperCase()];
+  const enc = new TextEncoder();
+  let shown = 0;
+  let marked = 0;
+  for (const f of v.file.facts) for (const p of pre) for (const q of post) for (const c of cases) {
+    const draft = `Sure! ${f.statement.replace(/[0-9]+/g, "99")} (the model's own wording)`;
+    const r = assembleReply(answer(v.file, v.company, { question: c(p + f.statement + q) }, marks, { checkBase: v.check_base }), draft);
+    assert.ok(r.discarded);
+    assert.ok(!r.text.includes("model's own wording"));
+    if (r.status !== "answer") continue;
+    const fact = byId.get(r.fact_id);
+    if (marks.has(fact.id)) {
+      marked += 1;
+      assert.equal(r.statement, null);
+      assert.ok(!r.text.includes(fact.statement));
+      continue;
+    }
+    const first = r.text.split("\n")[0];
+    assert.deepEqual(enc.encode(first), enc.encode(fact.statement), `byte for byte: ${fact.id}`);
+    assert.equal(r.statement, fact.statement);
+    assert.match(r.text, /\nSigned on \d{4}-\d{2}-\d{2}\. Check: https:\/\/api\.trooth\.co\/public\/semanto\/acme\/versions\/7$/);
+    shown += 1;
+  }
+  assert.ok(shown >= 1000, `${shown} value answers replayed`);
+  assert.ok(marked > 0, "marked facts were replayed too");
+});
+
+test("reply() builds the shown text from the signed copy and discards the draft", async () => {
+  const net = site();
+  const s = new SemantoSource("acme.com", { fetch: net.fetch, now: () => NOW });
+  const r = await s.reply({ question: "What does the Starter plan cost?", draft: "It is 19 USD a month." });
+  assert.equal(r.text.split("\n")[0], "The Starter plan costs 49 USD a month for up to 5 seats.");
+  assert.ok(r.discarded && !r.text.includes("19 USD"));
+  const none = await s.reply({ question: "What is the weather?", draft: "Sunny." });
+  assert.equal(none.status, "not_published");
+  assert.ok(!none.text.includes("Sunny"));
 });

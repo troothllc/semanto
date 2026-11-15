@@ -19,7 +19,7 @@
 // last good one stays in use and the failure is logged. No dependencies; runs wherever fetch and WebCrypto do.
 
 import { verifySemanto } from "./verify.mjs";
-import { answer as answerFrom, factMarks } from "./answer.mjs";
+import { answer as answerFrom, assembleReply, factMarks } from "./answer.mjs";
 
 export const TROOTH_API = "https://api.trooth.co";
 export const MAX_REFRESH_SECONDS = 900;
@@ -158,5 +158,14 @@ export class SemantoSource {
       return { object: "semanto.answer", status: "not_read", matched_by: null, company: { trooth_id: null, name: null, domain: this.domain }, version: null, facts: [], text: `No signed record of ${this.domain} could be read and checked yet.` };
     }
     return answerFrom(this.file, this.company, input, this.marks(), { checkBase: `${this.apiBase}/public/semanto` });
+  }
+
+  /**
+   * The reply a chatbot shows for a question: built by code from the signed record, with the model's draft discarded.
+   * @param {{ fact_id?: string, question?: string, draft?: string }} input
+   */
+  async reply(input) {
+    const { draft, ...q } = input;
+    return assembleReply(await this.answer(q), draft);
   }
 }
