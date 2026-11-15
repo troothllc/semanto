@@ -58,7 +58,7 @@ jobs:
         run: |
           sha256sum trooth-semanto-verify-*.tgz > SHA256SUMS
           for f in trooth-semanto-verify-*.tgz SHA256SUMS; do cosign sign-blob --yes --bundle "$f.sigstore.json" "$f"; done
-      - uses: actions/attest-build-provenance@v3
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: release/trooth-semanto-verify-*.tgz
       - name: The GitHub release for this tag
