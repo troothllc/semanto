@@ -5,6 +5,20 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 0.5.0 (2026-11-15)
+
+- What the customer sees. `SemantoSource.reply` now returns the reply built by `customer_reply` (`trooth_semanto_verify.turn`): a value answer is at most three lines, the signed sentence, its conditions, and "From <Company>'s signed record. Signed <date>. Check it: <link>" (`markdown` carries the link as a link), never more than 600 characters, and no library line speaks to the reader. The structured result carries the value, conditions, contact route and choices.
+- The not-published reply: the company's own not-published line and a contact route taken from the record (an email, a phone number, a contact page, or the company's site).
+- Follow-ups: `reply`, `respond` and every adapter take `history` (earlier questions); a follow-up is rewritten into a complete question and answered from the signed record alone. Earlier turns are never evidence.
+- A locked value (prices, contacts, hours, policies, anything typed) reached only by word overlap is not shown until the customer picks the question from at most three choices (`status: "confirm"`, then `reply(fact_id=..., confirmed=True)`).
+- Fails closed. Each refresh checks the version in use again with the company's keys as served and Trooth's revocation list; a withdrawn version, a key that no longer checks out, or no version at all gives `status: "closed"` with no value and the contact route. A fact marked changed since signing or expired shows its mark and the contact route. `on_alert` is called once per reason.
+- The output step: `output_step(text, question=...)` checks an agent's final answer; a price, phone number, email, percent or counted value the company did not sign is caught and the answer is replaced by the checked reply.
+- Quote-assembled answers: `quote(question, select)` lets the company's model pick one to three runs of sentence IDs from the signed pages (`SELECTION_SCHEMA`); code prints them unchanged under each page's title and link, and holds any sentence whose value is not the signed one. Pages are checked against their hashes in the manifest.
+- Streaming: `stream(tokens)` and `release_checked` release a sentence only after its check returns; a held sentence is never released.
+- Personal data: `mask_personal` masks emails, phone numbers and names that are not in the record before a sentence leaves the company's server (the model's selection, the `support_check` hook). Value answers send nothing about the question to Trooth.
+- Frameworks: `trooth.integrations.answer_path.answer_turn` and `wsgi_app` (plain HTTPS), `trooth.integrations.langchain.semanto_runnable`, `trooth.integrations.llama_index.SemantoQueryEngine`, and `trooth.integrations.openai_agents.semanto_output_guardrail`. Sample chatbots in `verifier/examples/answer-path` pass the 200 fixed conversations in Checked mode, and each catches a seeded altered value with the output step on.
+- `SemantoSource.from_checked(file)` answers from a copy the caller already checked and keeps up to date itself.
+
 ## 0.4.0 (2026-11-15)
 
 - Answer modes. `SemantoSource.respond(question=..., draft=...)` sends a reply in the company's answer mode, chosen on trooth.co and read from `/public/semanto/{id}/answer-mode`. Checked builds the reply by code and discards the model's draft. Source only sends the draft unchecked. Audit sends the draft and checks it right after: supported, differs (with the signed sentence), marked, not in record, or not checked. When the mode has never been read, Checked is used.

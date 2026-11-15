@@ -73,3 +73,26 @@ show(r["text"])  # Audit mode also returns r["audit"]: supported, differs, marke
 ```
 
 It loads `/.well-known/trooth.semanto` and the company's keys from the company's site, checks the file once for each new body, reads the site again at most every 15 minutes, and answers fact IDs and plain questions in process with the same matcher as Trooth's service (`trooth_semanto_verify.answer`, compared case by case with `verifier/test-vectors/answer-v1`). When Trooth's API cannot be reached it keeps answering from the last version that checked out and logs `trooth_api_unreachable`; a new version that does not check out is refused and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.
+
+## What the customer sees, turn by turn
+
+`reply` returns what a company's own chatbot shows for one turn, built by code (`trooth_semanto_verify.turn`). The
+status is `answer` (the signed sentence, its conditions, and "From Acme Inc's signed record. Signed 2026-11-12. Check
+it: <link>"), `not_published` (the company's not-published line and its contact route), `marked` (the mark and the
+contact route, no value), `choose` (up to three choices), `confirm` (a locked value found only by word overlap waits
+for the customer to pick), or `closed` (no checked version, a withdrawn version or a revoked key; `on_alert` is called
+once).
+
+```python
+r = acme.reply(question=user_question, history=earlier_questions)
+r = acme.output_step(agent_answer, question=user_question)    # replaces an answer carrying an unsigned value
+q = acme.quote(user_question, select=my_model_picks_sentence_ids)  # the company's own signed sentences, printed by code
+for s in acme.stream(token_iterator):                            # each sentence released after its check
+    send(s["sentence"])
+```
+
+## Frameworks
+
+`trooth.integrations.answer_path` (`answer_turn`, `wsgi_app` for plain HTTPS), `trooth.integrations.langchain.semanto_runnable`,
+`trooth.integrations.llama_index.SemantoQueryEngine` and `trooth.integrations.openai_agents.semanto_output_guardrail` add
+the three modes and the output step. Sample chatbots are in `verifier/examples/answer-path`.

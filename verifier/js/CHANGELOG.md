@@ -5,6 +5,20 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 1.5.0 (2026-11-15)
+
+- What the customer sees. `SemantoSource.reply` now returns the reply built by `customerReply` (`@trooth/semanto-verify/turn`): a value answer is at most three lines, the signed sentence, its conditions, and "From <Company>'s signed record. Signed <date>. Check it: <link>" (`markdown` carries the link as a link), never more than 600 characters, and no library line speaks to the reader. The structured result carries the value, conditions, contact route and choices.
+- The not-published reply: the company's own not-published line and a contact route taken from the record (an email, a phone number, a contact page, or the company's site).
+- Follow-ups: `reply`, `respond` and every adapter take `history` (earlier questions); a follow-up is rewritten into a complete question and answered from the signed record alone. Earlier turns are never evidence.
+- A locked value (prices, contacts, hours, policies, anything typed) reached only by word overlap is not shown until the customer picks the question from at most three choices (`status: "confirm"`, then `reply({ fact_id, confirmed: true })`).
+- Fails closed. Each refresh checks the version in use again with the company's keys as served and Trooth's revocation list; a withdrawn version, a key that no longer checks out, or no version at all gives `status: "closed"` with no value and the contact route. A fact marked changed since signing or expired shows its mark and the contact route. `onAlert` is called once per reason.
+- The output step: `outputStep({ question, text })` checks an agent's final answer; a price, phone number, email, percent or counted value the company did not sign is caught and the answer is replaced by the checked reply.
+- Quote-assembled answers: `quote({ question, select })` lets the company's model pick one to three runs of sentence IDs from the signed pages (`SELECTION_SCHEMA`); code prints them unchanged under each page's title and link, and holds any sentence whose value is not the signed one. Pages are checked against their hashes in the manifest.
+- Streaming: `stream(tokens)` and `releaseChecked` release a sentence only after its check returns; a held sentence is never released.
+- Personal data: `maskPersonal` masks emails, phone numbers and names that are not in the record before a sentence leaves the company's server (the model's selection, the `supportCheck` hook). Value answers send nothing about the question to Trooth.
+- Frameworks (`@trooth/semanto-verify/frameworks`, no dependencies): `semantoMiddleware` for the Vercel AI SDK, `withSemanto` for LangChain.js runnables and LlamaIndex.TS query engines, `semantoOutputGuardrail` for the OpenAI Agents SDK, and `semantoHandler`, a fetch handler for plain HTTPS. Sample chatbots in `verifier/examples/answer-path` pass the 200 fixed conversations in Checked mode, and each catches a seeded altered value with the output step on.
+- `SemantoSource.fromChecked(file)` answers from a copy the caller already checked and keeps up to date itself.
+
 ## 1.4.1 (2026-11-15)
 
 - The Signature-Input, Signature and Link header parsers, base64 trimming, field folding and URL trimming no longer use regular expressions that can backtrack: each reads its input in one pass, so a hostile header of any length is parsed in linear time (found by CodeQL). Every shared vector gives the same result.

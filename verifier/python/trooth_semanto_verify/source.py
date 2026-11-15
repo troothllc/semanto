@@ -26,12 +26,14 @@ import unicodedata
 import time
 import urllib.parse
 from datetime import datetime, timezone
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
 from .answer import answer as _answer
-from .answer import MARK_WORDS, assemble_reply, fact_marks
+from .answer import MARK_WORDS, fact_marks
 from .client import Fetch, urllib_fetch
-from .verify import verify_semanto
+from .turn import (check_final_answer, check_sentence, complete_question, customer_reply, is_locked, mask_personal, page_sentences, quote_answer,
+                   release_checked, signed_values)
+from .verify import state_of, verify_semanto
 
 TROOTH_API = "https://api.trooth.co"
 MAX_REFRESH_SECONDS = 900
@@ -41,7 +43,8 @@ ANSWER_MODES = ("checked", "source_only", "audit")
 
 class SemantoSource:
     def __init__(self, domain: str, fetch: Optional[Fetch] = None, api_base: str = TROOTH_API, refresh_seconds: float = MAX_REFRESH_SECONDS,
-                 now: Optional[Callable[[], float]] = None, on_event: Optional[Callable[[dict], None]] = None):
+                 now: Optional[Callable[[], float]] = None, on_event: Optional[Callable[[dict], None]] = None,
+                 on_alert: Optional[Callable[[dict], None]] = None, support_check: Optional[Callable[[str], bool]] = None):
         d = domain.lower()
         for p in ("https://", "http://"):
             if d.startswith(p):
@@ -64,6 +67,46 @@ class SemantoSource:
         self._mode: Optional[dict] = None
         self._mode_read_at: Optional[float] = None
         self._mode_fresh = False
+        # Why no value may be shown (not_read, withdrawn, key_revoked, recheck_failed), or None.
+        self.closed: Optional[str] = None
+        self.revocations: Optional[dict] = None
+        self._alerted: set = set()
+        self.on_alert = on_alert
+        self.support_check = support_check
+        self._pages: Dict[str, dict] = {}
+
+    @classmethod
+    def from_checked(cls, file: dict, domain: Optional[str] = None, now: Optional[Callable[[], float]] = None, changed: Optional[List[str]] = None,
+                     mode: str = "checked", **kw: Any) -> "SemantoSource":
+        """A source over a copy the caller already checked (verify_semanto) and keeps up to date itself: no site reads, no
+        refresh. The marks are the date marks plus `changed`; the mode is `mode`."""
+        h = file.get("header") or {}
+
+        def no_network(url: str, headers: Dict[str, str]):
+            raise OSError("this source does not read the network")
+
+        s = cls(domain or (h.get("domains") or [None])[0] or (h.get("identity") or {}).get("domain") or "localhost", fetch=kw.pop("fetch", None) or no_network, now=now, **kw)
+        s.file = file
+        s._body = json.dumps(file, sort_keys=True, separators=(",", ":"))
+        s.company = {"trooth_id": h["trooth_id"], "org": h["org"], "domain": s.domain}
+        s.changed = list(changed or [])
+        s.checked_at = float("inf")
+        s._mode = {"mode": mode, "generated_sentences": False}
+        s._mode_read_at = float("inf")
+        s._mode_fresh = True
+        return s
+
+    def _alert(self, reason: str, detail: str) -> None:
+        """Tell the owner, once per reason, that customers are getting the fail-closed or contact-route reply."""
+        if reason in self._alerted:
+            return
+        self._alerted.add(reason)
+        self._log("owner_alert", f"{reason}: {detail}")
+        if self.on_alert:
+            try:
+                self.on_alert({"reason": reason, "detail": detail})
+            except Exception:  # noqa: BLE001 (the owner's hook must not stop a reply)
+                pass
 
     def _log(self, event: str, detail: str) -> None:
         e = {"at": datetime.fromtimestamp(self.now(), timezone.utc).isoformat().replace("+00:00", "Z"), "event": event, "detail": detail}
@@ -129,7 +172,42 @@ class SemantoSource:
                 self.changed = []
                 self._log("version_adopted", f"Version {h['version']} checked out and is in use." if before is None else f"Version {h['version']} checked out and replaces version {before}.")
         if self.file:
+            self._recheck()
             self._read_marks()
+
+    def _recheck(self) -> None:
+        """Check the version in use again with the company's keys as served now and Trooth's revocation list: a withdrawn
+        version or a key that no longer checks out closes the answer path until a version checks out."""
+        tid = urllib.parse.quote(self.file["header"]["trooth_id"], safe="")
+        try:
+            status, _, body = self.fetch(f"{self.api_base}/public/semanto/{tid}/revocations", {"Accept": "application/json"})
+            if status == 200:
+                self.revocations = json.loads(body).get("list")
+            elif status == 404:
+                self.revocations = None
+            else:
+                raise RuntimeError(f"answered {status}")
+        except Exception as e:  # noqa: BLE001
+            self._log("trooth_api_unreachable", f"The revocation list could not be read ({e}); the last one is used.")
+        try:
+            company = self._json(f"https://{self.domain}/.well-known/trooth-keys.json")
+        except Exception:  # noqa: BLE001 (the site is down: keep the last result)
+            company = None
+        at = datetime.fromtimestamp(self.now(), timezone.utc)
+        closed: Optional[str]
+        if state_of(self.file, at, self.revocations) == "withdrawn":
+            closed = "withdrawn"
+        elif company is not None:
+            res = verify_semanto(self.file, None, {"company": company, "trooth": self.trooth_keys or {"keys": []}}, now=at, revocations=self.revocations)
+            closed = None
+            if not res.get("ok") and res.get("reason") != "witness_unverified" and self.trooth_keys:
+                closed = "key_revoked" if "key" in str(res.get("reason")) else "recheck_failed"
+        else:
+            closed = self.closed
+        if closed != self.closed:
+            v = self.file["header"]["version"]
+            self._log("answer_path_closed" if closed else "answer_path_open", f"Version {v}: {closed}; no value is shown until a version checks out." if closed else f"Version {v} checks out again.")
+        self.closed = closed
 
     def _read_marks(self) -> None:
         tid = urllib.parse.quote(self.file["header"]["trooth_id"], safe="")
@@ -159,9 +237,21 @@ class SemantoSource:
                     "version": None, "facts": [], "text": f"No signed record of {self.domain} could be read and checked yet."}
         return _answer(self.file, self.company, fact_id=fact_id, question=question, marks=self.marks(), check_base=f"{self.api_base}/public/semanto")
 
-    def reply(self, fact_id: Optional[str] = None, question: Optional[str] = None, draft: Optional[str] = None) -> dict:
-        """The reply a chatbot shows for a question: built by code from the signed record, with the model's draft discarded."""
-        return assemble_reply(self.answer(fact_id=fact_id, question=question), draft)
+    def reply(self, fact_id: Optional[str] = None, question: Optional[str] = None, draft: Optional[str] = None, history: Optional[List[str]] = None,
+              confirmed: bool = False) -> dict:
+        """The reply a chatbot shows a customer for one turn, built by code from the signed record (turn.customer_reply);
+        the draft is discarded. A follow-up is completed from `history` and answered alone. Fails closed: with no checked
+        version, a withdrawn version or a revoked key, no value is shown and the owner is alerted once."""
+        if question is not None and not fact_id:
+            question = complete_question(question, history or [])
+        a = self.answer(fact_id=fact_id, question=question)
+        closed = self.closed if self.file else "not_read"
+        r = customer_reply(a, self.file, draft=draft, closed=closed, domain=self.domain, confirmed=confirmed)
+        if r["status"] == "closed":
+            self._alert(r["reason"], f"customers get the fail-closed reply for {self.domain}")
+        if r["status"] == "marked":
+            self._alert(f"marked:{r['fact_id']}", f"fact {r['fact_id']} is {r['mark']}; customers get the contact route instead of a value")
+        return {**r, "question": question}
 
     def answer_mode(self) -> dict:
         """The company's answer mode, read from Trooth and kept between reads. When it has never been read (Trooth's API
@@ -182,10 +272,13 @@ class SemantoSource:
             return {**self._mode, "source": "trooth" if self._mode_fresh else "last_read"}
         return {"mode": "checked", "generated_sentences": False, "source": "fail_closed"}
 
-    def respond(self, question: Optional[str] = None, draft: str = "", fact_id: Optional[str] = None, mode: Optional[str] = None) -> dict:
+    def respond(self, question: Optional[str] = None, draft: str = "", fact_id: Optional[str] = None, mode: Optional[str] = None,
+                history: Optional[List[str]] = None) -> dict:
         """The reply a chatbot sends, in the company's answer mode (or `mode` when given). checked: built by code from the
         signed record, the draft discarded. source_only: the draft as written, nothing checked. audit: the draft as
         written, checked right after; the result is in "audit" and in an "audit" event."""
+        if question is not None and not fact_id:
+            question = complete_question(question, history or [])
         m = mode if mode in ANSWER_MODES else self.answer_mode()["mode"]
         if m == "checked":
             return {"mode": m, **self.reply(fact_id=fact_id, question=question, draft=draft)}
@@ -194,6 +287,87 @@ class SemantoSource:
         result = audit_draft(self.answer(fact_id=fact_id, question=question), draft, self.file)
         self._log("audit", f"{result['result']}: {question or fact_id or ''}".strip())
         return {"mode": m, "status": "unchecked", "text": draft, "audit": result}
+
+    def output_step(self, text: str, question: Optional[str] = None, fact_id: Optional[str] = None, history: Optional[List[str]] = None) -> dict:
+        """Run the value check on an agent's final answer before it is returned. When a value in it is not one the company
+        signed, the answer is replaced by the checked reply for the question and `caught` lists the values."""
+        self.ensure_fresh()
+        if not self.file or self.closed:
+            r = self.reply(fact_id=fact_id, question=question, history=history)
+            return {"ok": False, "replaced": True, "caught": [], "reply": r, "text": r["text"]}
+        check = check_final_answer(text, self.file)
+        if check["ok"]:
+            return {"ok": True, "replaced": False, "caught": [], "text": text}
+        self._log("altered_value_caught", f"{', '.join(v['raw'] for v in check['caught']) or 'an instruction'} in an answer to {question or fact_id or 'a question'}")
+        r = self.reply(fact_id=fact_id, question=question, history=history, draft=text)
+        return {"ok": False, "replaced": True, "caught": check["caught"], "instructions": check["instructions"], "reply": r, "text": r["text"]}
+
+    def pages(self, ids: Optional[List[str]] = None) -> List[dict]:
+        """The signed pages of the version in use ({id, title, url, text}), each checked against its hash in the manifest."""
+        import hashlib
+        self.ensure_fresh()
+        if not self.file:
+            return []
+        out = []
+        tid = urllib.parse.quote(self.file["header"]["trooth_id"], safe="")
+        for p in self.file["header"].get("pages_manifest") or []:
+            if ids and p["id"] not in ids:
+                continue
+            key = f"{self.file['root_hash']}|{p['id']}"
+            if key not in self._pages:
+                try:
+                    status, _, body = self.fetch(f"{self.api_base}/public/semanto/{tid}/pages/{p['id']}", {"Accept": "text/markdown"})
+                    if status != 200:
+                        raise RuntimeError(f"answered {status}")
+                    b = body if isinstance(body, (bytes, bytearray)) else str(body).encode()
+                    if "sha256:" + hashlib.sha256(b).hexdigest() != p["hash"]:
+                        raise RuntimeError("its bytes do not match the signed hash")
+                    self._pages[key] = {"id": p["id"], "title": p.get("title"), "url": p["url"], "text": bytes(b).decode()}
+                except Exception as e:  # noqa: BLE001
+                    self._log("page_unreadable", f"Page {p['url']} could not be used ({e}); its sentences are not quoted.")
+                    continue
+            out.append(self._pages[key])
+        return out
+
+    def quote(self, question: str, select: Callable[[str, List[dict]], Any], pages: Optional[List[dict]] = None) -> dict:
+        """A free-form answer quoted from the company's signed pages. `select(question, sentences)` is the company's model,
+        returning only {"runs": [{"from", "to"}]} under SELECTION_SCHEMA; personal details are masked before it sees the
+        question, and code prints the runs unchanged, holding any sentence whose value is not the signed one."""
+        self.ensure_fresh()
+        if not self.file or self.closed:
+            return customer_reply({"status": "not_read", "company": self.company, "facts": []}, self.file, closed=self.closed if self.file else "not_read", domain=self.domain)
+        signed_pages = pages if pages is not None else self.pages()
+        sentences = [s for p in signed_pages for s in page_sentences(p)]
+        try:
+            selection = select(mask_personal(question, self.file), sentences)
+        except Exception as e:  # noqa: BLE001
+            self._log("model_failed", f"The model gave no selection ({e}).")
+            selection = None
+        q = quote_answer(self.file, signed_pages, selection, org=self.company["org"], domain=self.domain)
+        if q["held"]:
+            self._log("sentences_held", f"{len(q['held'])} sentence(s) held: " + ", ".join(f"{h['id']} ({h['reason']})" for h in q["held"]))
+        return q
+
+    def stream(self, tokens: Iterable[str], recording: Optional[list] = None):
+        """Stream an answer sentence by sentence; each sentence is released only after its check returns. With
+        support_check set, the masked sentence is sent there and must come back True as well."""
+        self.ensure_fresh()
+        if not self.file or self.closed:
+            return iter(())
+        signed = signed_values(self.file)
+
+        def check(s: str) -> bool:
+            if not check_sentence(s, self.file, signed)["ok"]:
+                return False
+            if self.support_check:
+                return self.support_check(mask_personal(s, self.file)) is True
+            return True
+
+        return release_checked(tokens, check, now=self.now, recording=recording)
+
+    def locked(self, fact_id: str) -> bool:
+        """Whether a fact is answered only by code."""
+        return is_locked(next((f for f in (self.file or {}).get("facts") or [] if f.get("id") == fact_id), None))
 
 
 def audit_draft(a: dict, draft: str, file: Optional[dict] = None) -> dict:

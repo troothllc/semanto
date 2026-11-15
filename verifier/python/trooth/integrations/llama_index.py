@@ -5,11 +5,13 @@ from __future__ import annotations
 
 from typing import Any, List, Optional
 
+from llama_index.core.query_engine import CustomQueryEngine
 from llama_index.core.readers.base import BaseReader
 from llama_index.core.schema import Document
 from trooth_semanto_verify.client import SemantoClient
 
 from . import metadata_of
+from .answer_path import answer_turn, text_of
 
 
 class SemantoReader(BaseReader):
@@ -31,4 +33,19 @@ class SemantoReader(BaseReader):
         return out
 
 
-__all__ = ["SemantoReader"]
+class SemantoQueryEngine(CustomQueryEngine):
+    """A query engine that answers in the company's answer mode: Checked builds the reply by code from the signed record
+    (the inner engine is not called); Source only and Audit return the inner engine's answer after the output step."""
+
+    inner: Any
+    source: Any
+    mode: Optional[str] = None
+    output_step: bool = True
+
+    def custom_query(self, query_str: str) -> str:
+        m = self.mode or self.source.answer_mode()["mode"]
+        draft = "" if m == "checked" else text_of(self.inner.query(query_str))
+        return answer_turn(self.source, question=query_str, draft=draft, mode=m, output_step=self.output_step)["text"]
+
+
+__all__ = ["SemantoReader", "SemantoQueryEngine"]
