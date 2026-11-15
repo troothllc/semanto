@@ -5,6 +5,11 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 1.4.1 (2026-11-15)
+
+- The Signature-Input, Signature and Link header parsers, base64 trimming, field folding and URL trimming no longer use regular expressions that can backtrack: each reads its input in one pass, so a hostile header of any length is parsed in linear time (found by CodeQL). Every shared vector gives the same result.
+- The command line fetches only https URLs (and http on this machine) and sends no credentials.
+
 ## 1.4.0 (2026-11-15)
 
 - Answer modes. `SemantoSource.respond({ question, draft })` sends a reply in the company's answer mode, chosen on trooth.co and read from `/public/semanto/{id}/answer-mode`. Checked builds the reply by code and discards the model's draft. Source only sends the draft unchecked. Audit sends the draft and checks it right after: supported, differs (with the signed sentence), marked, not in record, or not checked. When the mode has never been read, Checked is used.

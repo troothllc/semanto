@@ -51,8 +51,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: |
           python3 -m pip install --require-hashes -r requirements-ci.txt
-          python3 -m pip install --no-deps .
-          python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py
+          PYTHONPATH="$PWD" python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py
 
   go:
     name: Go (${{ matrix.go }})

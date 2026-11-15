@@ -88,8 +88,15 @@ export function toBase64(b) {
   return out;
 }
 
+/** s without trailing characters in `set`, in one pass (no regex, so no backtracking on hostile input). */
+export function trimEnd(s, set) {
+  let end = s.length;
+  while (end > 0 && set.includes(s[end - 1])) end--;
+  return s.slice(0, end);
+}
+
 export function fromBase64(s) {
-  const clean = s.replace(/[\s=]+$/g, "").replace(/\s+/g, "");
+  const clean = trimEnd(s, " \t\r\n\f\v=").replace(/\s+/g, "");
   const bytes = [];
   let buf = 0;
   let bits = 0;
@@ -490,7 +497,95 @@ function headerGet(headers, name) {
   return Array.isArray(v) ? v.map((x) => x.trim()).join(", ") : String(v);
 }
 
-const canonField = (v) => v.replace(/[\r\n]+[ \t]+/g, " ").trim();
+/** RFC 9421 2.1: obsolete line folding (a line break followed by spaces or tabs) becomes one space; one linear pass. */
+function canonField(v) {
+  let out = "";
+  let i = 0;
+  while (i < v.length) {
+    const c = v[i];
+    if (c === "\r" || c === "\n") {
+      let j = i;
+      while (j < v.length && (v[j] === "\r" || v[j] === "\n")) j++;
+      let k = j;
+      while (k < v.length && (v[k] === " " || v[k] === "\t")) k++;
+      if (k > j) { out += " "; i = k; } else { out += v.slice(i, j); i = j; }
+      continue;
+    }
+    out += c;
+    i++;
+  }
+  return out.trim();
+}
+
+/** Split a structured header at top-level commas: commas inside quotes, parentheses or angle brackets do not split. */
+function splitTopLevel(value) {
+  const out = [];
+  let depth = 0;
+  let quoted = false;
+  let start = 0;
+  for (let i = 0; i < value.length; i++) {
+    const c = value[i];
+    if (quoted) {
+      if (c === "\\") i++;
+      else if (c === '"') quoted = false;
+    } else if (c === '"') quoted = true;
+    else if (c === "(" || c === "<") depth++;
+    else if ((c === ")" || c === ">") && depth > 0) depth--;
+    else if (c === "," && depth === 0) {
+      out.push(value.slice(start, i));
+      start = i + 1;
+    }
+  }
+  out.push(value.slice(start));
+  return out.map((x) => x.trim()).filter(Boolean);
+}
+
+const LABEL = /^[A-Za-z0-9_*.-]+$/;
+const PARAM_KEY = /^[A-Za-z*][A-Za-z0-9_.*-]*$/;
+
+/** A quoted string starting at s[i] === '"': [unescaped text, index after the closing quote], or null if it never closes. */
+function readQuoted(s, i) {
+  let out = "";
+  for (let j = i + 1; j < s.length; j++) {
+    const c = s[j];
+    if (c === "\\") {
+      if (j + 1 >= s.length) return null;
+      out += s[++j];
+    } else if (c === '"') return [out, j + 1];
+    else out += c;
+  }
+  return null;
+}
+
+/** RFC 8941 parameters (;key or ;key=value, value a quoted string or a token) from s[i]; [params, raw text] or null. */
+function readParams(s, i) {
+  const params = [];
+  const start = i;
+  while (i < s.length && s[i] === ";") {
+    let j = i + 1;
+    while (j < s.length && /[A-Za-z0-9_.*-]/.test(s[j])) j++;
+    const key = s.slice(i + 1, j);
+    if (!PARAM_KEY.test(key)) return null;
+    let value = "";
+    if (s[j] === "=") {
+      if (s[j + 1] === '"') {
+        const q = readQuoted(s, j + 1);
+        if (!q) return null;
+        value = q[0];
+        j = q[1];
+      } else {
+        let k = j + 1;
+        while (k < s.length && s[k] !== ";" && s[k] !== "," && !/\s/.test(s[k])) k++;
+        if (k === j + 1) return null;
+        value = s.slice(j + 1, k);
+        j = k;
+      }
+    }
+    params.push([key, value]);
+    i = j;
+  }
+  return [params, s.slice(start, i), i];
+}
 
 function sfString(s) {
   if (/[^\x20-\x7e]/.test(s)) throw new Error("non-ASCII in structured field string");
@@ -528,28 +623,51 @@ function derived(name, m) {
 
 export function parseSignatureInput(value) {
   const out = {};
-  const re = /([A-Za-z0-9_*.-]+)=\(((?:\s*"(?:[^"\\]|\\.)*")*)\s*\)((?:;[A-Za-z*][A-Za-z0-9_.*-]*(?:=(?:"(?:[^"\\]|\\.)*"|[^;,\s]+))?)*)/g;
-  let m;
-  while ((m = re.exec(value)) !== null) {
-    const label = m[1];
-    const components = [...m[2].matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((x) => x[1].replace(/\\(.)/g, "$1"));
+  for (const member of splitTopLevel(String(value ?? ""))) {
+    const eq = member.indexOf("=(");
+    if (eq <= 0) continue;
+    const label = member.slice(0, eq);
+    if (!LABEL.test(label)) continue;
+    // The inner list: quoted component names separated by spaces, up to the closing parenthesis.
+    const components = [];
+    let i = eq + 2;
+    let ok = true;
+    for (;;) {
+      while (i < member.length && (member[i] === " " || member[i] === "\t")) i++;
+      if (member[i] === ")") break;
+      if (member[i] !== '"') { ok = false; break; }
+      const q = readQuoted(member, i);
+      if (!q) { ok = false; break; }
+      components.push(q[0]);
+      i = q[1];
+    }
+    if (!ok) continue;
+    const inner = member.slice(eq + 2, i).trim();
+    const read = readParams(member, i + 1);
+    if (!read || read[2] !== member.length) continue;
     const params = {};
-    for (const pm of m[3].matchAll(/;([A-Za-z*][A-Za-z0-9_.*-]*)(?:=("(?:[^"\\]|\\.)*"|[^;,\s]+))?/g)) {
-      const k = pm[1];
-      const v = pm[2] === undefined ? "" : pm[2].startsWith('"') ? pm[2].slice(1, -1).replace(/\\(.)/g, "$1") : pm[2];
+    for (const [k, v] of read[0]) {
       // RFC 9421 2.3: Integers only; anything else is NaN and refused as malformed.
       if (k === "created" || k === "expires") params[k] = /^-?\d{1,15}$/.test(v) ? Number(v) : Number.NaN;
       else if (k === "keyid" || k === "alg" || k === "nonce" || k === "tag") params[k] = v;
     }
     if (typeof params.created !== "number" || typeof params.keyid !== "string") continue;
-    out[label] = { components, params, raw: `(${m[2].trim()})${m[3]}` };
+    out[label] = { components, params, raw: `(${inner})${read[1]}` };
   }
   return out;
 }
 
+const B64_TOKEN = /^[A-Za-z0-9+/=]+$/;
+
 export function parseSignature(value) {
   const out = {};
-  for (const m of value.matchAll(/([A-Za-z0-9_*.-]+)=:([A-Za-z0-9+/=]+):/g)) out[m[1]] = fromBase64(m[2]);
+  for (const member of splitTopLevel(String(value ?? ""))) {
+    const eq = member.indexOf("=:");
+    if (eq <= 0 || !member.endsWith(":") || member.length < eq + 4) continue;
+    const label = member.slice(0, eq);
+    const b64 = member.slice(eq + 2, -1);
+    if (LABEL.test(label) && B64_TOKEN.test(b64)) out[label] = fromBase64(b64);
+  }
   return out;
 }
 
@@ -1114,11 +1232,38 @@ export async function verifyRevocationList(jws, keys = {}, opts = {}) {
 export function parseLink(value) {
   const out = [];
   if (!value) return out;
-  for (const m of value.matchAll(/<([^>]*)>((?:\s*;\s*[A-Za-z0-9-]+=(?:"[^"]*"|[^;,]*))*)/g)) {
+  for (const member of splitTopLevel(String(value))) {
+    if (member[0] !== "<") continue;
+    const close = member.indexOf(">");
+    if (close < 0) continue;
     const params = {};
-    for (const pm of m[2].matchAll(/;\s*([A-Za-z0-9-]+)=("([^"]*)"|[^;,]*)/g)) params[pm[1].toLowerCase()] = pm[3] !== undefined ? pm[3] : pm[2].trim();
-    out.push({ url: m[1], params });
+    for (const part of splitParams(member.slice(close + 1))) {
+      const eq = part.indexOf("=");
+      if (eq <= 0) continue;
+      const key = part.slice(0, eq).trim();
+      if (!/^[A-Za-z0-9-]+$/.test(key)) continue;
+      const raw = part.slice(eq + 1).trim();
+      params[key.toLowerCase()] = raw.length >= 2 && raw[0] === '"' && raw.endsWith('"') ? raw.slice(1, -1) : raw;
+    }
+    out.push({ url: member.slice(1, close), params });
   }
+  return out;
+}
+
+/** The ;-separated parameters after a Link URL, semicolons inside quotes kept. */
+function splitParams(s) {
+  const out = [];
+  let quoted = false;
+  let start = -1;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '"') quoted = !quoted;
+    else if (c === ";" && !quoted) {
+      if (start >= 0) out.push(s.slice(start, i));
+      start = i + 1;
+    }
+  }
+  if (start >= 0) out.push(s.slice(start));
   return out;
 }
 
