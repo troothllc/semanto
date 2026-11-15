@@ -33,3 +33,13 @@ node --test verifier/js/test/vectors.test.mjs
 ## Releases
 
 Maintainers release from this repository: a tag `js-v<version>`, `python-v<version>` or `verifier/go/v<version>` on main runs the matching workflow, which tests, publishes with provenance, signs the files and makes the GitHub release.
+
+## Pinned tools
+
+CI and the releases install exactly what is locked, so a compromised upstream release cannot slip in:
+
+- Python: `verifier/python/requirements-ci.txt`, with hashes, made from `requirements-ci.in` and `pyproject.toml` by the `uv pip compile` line at the top of `requirements-ci.in`, installed with `pip install --require-hashes`, and the package itself with `--no-deps`.
+- npm: the CLI the release publishes with is `.github/npm-cli`, installed with `npm ci`.
+- Actions: every `uses:` names a full commit, with its version in a comment.
+
+Dependabot proposes each update as a pull request.

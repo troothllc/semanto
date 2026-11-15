@@ -42,8 +42,9 @@ jobs:
         with:
           node-version: 24
           registry-url: "https://registry.npmjs.org"
-      - name: npm 11.15.0 or later (staged publishing needs it)
-        run: npm install -g npm@^11.15.0
+      - name: npm 11.15.0 or later (staged publishing needs it), from a lockfile
+        working-directory: .github/npm-cli
+        run: npm ci --no-audit --no-fund && echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
       - name: The tag is the package version
         run: |
           V="$(node -p "require('./package.json').version")"
