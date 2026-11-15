@@ -9,6 +9,8 @@ name: Release the Go verifier
 on:
   push:
     tags: ["verifier/go/v*"]
+  # The release workflow starts this on the new tag; a tag pushed by a workflow does not start runs by itself.
+  workflow_dispatch:
 
 permissions:
   contents: read

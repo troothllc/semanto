@@ -9,6 +9,8 @@ name: Publish trooth to PyPI
 on:
   push:
     tags: ["python-v*"]
+  # The release workflow starts this on the new tag; a tag pushed by a workflow does not start runs by itself.
+  workflow_dispatch:
 
 permissions: {}
 

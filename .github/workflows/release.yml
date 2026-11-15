@@ -1,0 +1,63 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 Trooth, LLC
+#
+# Releases follow the merge queue. After every merge to main this reads each package's version, and for any version
+# that has no tag yet it creates the tag on the merged commit and starts that package's publish workflow on it:
+#   @trooth/semanto-verify   verifier/js/package.json          js-v<version>        publish-npm.yml (staged on npm)
+#   trooth (PyPI)            verifier/python/pyproject.toml    python-v<version>    publish-pypi.yml
+#   Go verifier              verifier/go/CHANGELOG.md top      verifier/go/v<ver>   release-go.yml
+#   Semanto on deploy        CHANGELOG.md top Action entry     v<ver> and v<major>  (the tag is the release)
+# To release, a pull request bumps the version and its changelog; nothing else is needed.
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Tag new versions and start their publish workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name "Trooth"
+          git config user.email "284440571+trooth-eng@users.noreply.github.com"
+          js=$(node -p "require('./verifier/js/package.json').version")
+          py=$(sed -n 's/^version = "\(.*\)"$/\1/p' verifier/python/pyproject.toml | head -1)
+          go=$(sed -n 's/^## \(v[0-9][0-9.]*\) .*/\1/p' verifier/go/CHANGELOG.md | head -1)
+          act=$(sed -n 's/^### Semanto on deploy \(v[0-9][0-9.]*\) .*/\1/p' CHANGELOG.md | head -1)
+          release() { # tag workflow
+            if git rev-parse -q --verify "refs/tags/$1" >/dev/null; then echo "$1 exists"; return; fi
+            git tag -a "$1" -m "$1" "$GITHUB_SHA"
+            git push origin "refs/tags/$1"
+            echo "::notice::tagged $1"
+            if [ -n "$2" ]; then gh workflow run "$2" --repo "$GITHUB_REPOSITORY" --ref "$1"; echo "::notice::started $2 on $1"; fi
+          }
+          [ -n "$js" ] && release "js-v$js" publish-npm.yml
+          [ -n "$py" ] && release "python-v$py" publish-pypi.yml
+          [ -n "$go" ] && release "verifier/go/$go" release-go.yml
+          if [ -n "$act" ]; then
+            release "$act" ""
+            major="${act%%.*}"
+            if [ "$(git rev-parse -q --verify "refs/tags/$major^{commit}" || true)" != "$(git rev-parse "refs/tags/$act^{commit}")" ]; then
+              git tag -f -a "$major" -m "$major follows $act" "refs/tags/$act^{commit}"
+              git push -f origin "refs/tags/$major"
+              echo "::notice::$major now follows $act"
+            fi
+          fi
