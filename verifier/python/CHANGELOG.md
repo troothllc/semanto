@@ -5,6 +5,11 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 0.4.0 (2026-11-15)
+
+- Answer modes. `SemantoSource.respond(question=..., draft=...)` sends a reply in the company's answer mode, chosen on trooth.co and read from `/public/semanto/{id}/answer-mode`. Checked builds the reply by code and discards the model's draft. Source only sends the draft unchecked. Audit sends the draft and checks it right after: supported, differs (with the signed sentence), marked, not in record, or not checked. When the mode has never been read, Checked is used.
+- `verifier/test-vectors/answer-v1/conversations.json`: 200 fixed conversations with follow-ups and attempts to change a value by instruction. In Checked mode every line shown is a signed sentence or a fixed library line.
+
 ## 0.3.0 (2026-11-15)
 
 - `assemble_reply(answer, draft)` and `SemantoSource.reply(question=..., draft=...)` build what the customer is shown by code: for a value answer the signed sentence exactly as signed, its conditions, the day it was signed and the check link. A model's draft is discarded and never appears. A marked fact shows its mark and no value. 1,000 replayed value questions show the signed sentence byte for byte.

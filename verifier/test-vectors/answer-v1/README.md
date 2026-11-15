@@ -8,6 +8,9 @@ The answer matcher every library runs in process, and the answers Trooth's servi
 - `matcher.json`: the matcher's data (the order of the steps, the thresholds, the key terms and the key catalog) and
   its id. The id is an FNV-1a hash of that data and equals the `matcher` field of every answer from
   `GET https://api.trooth.co/public/semanto/answer`.
+- `conversations.json`: 200 fixed conversations against that record, with follow-ups and attempts to change a value by
+  instruction; each turn carries a model draft with a wrong value. In Checked mode every line shown must be a signed
+  sentence, its conditions, its signed-on and check line, a mark, or a fixed library line.
 - `answers.json`: a file of facts, the marks in force (one fact the monitor found changed, one past its valid-through
   date), a fixed time, and the service's answer to each question and fact ID. A library passes when its answer to every
   case equals the expected one exactly.

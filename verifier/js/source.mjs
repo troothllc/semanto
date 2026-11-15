@@ -19,10 +19,12 @@
 // last good one stays in use and the failure is logged. No dependencies; runs wherever fetch and WebCrypto do.
 
 import { verifySemanto } from "./verify.mjs";
-import { answer as answerFrom, assembleReply, factMarks } from "./answer.mjs";
+import { answer as answerFrom, assembleReply, factMarks, MARK_WORDS } from "./answer.mjs";
 
 export const TROOTH_API = "https://api.trooth.co";
 export const MAX_REFRESH_SECONDS = 900;
+/** The answer modes a company chooses on trooth.co. */
+export const ANSWER_MODES = ["checked", "source_only", "audit"];
 
 export class SemantoSource {
   /**
@@ -47,6 +49,8 @@ export class SemantoSource {
     this.checkedAt = 0;
     this.checks = 0;
     this.inflight = null;
+    this.modeSetting = null;
+    this.modeReadAt = 0;
   }
 
   log(event, detail) {
@@ -168,4 +172,67 @@ export class SemantoSource {
     const { draft, ...q } = input;
     return assembleReply(await this.answer(q), draft);
   }
+
+  /**
+   * The company's answer mode, read from Trooth with the marks and kept between reads. When it has never been read
+   * (Trooth's API unreachable from the start), Checked is used: the strictest mode, so nothing unchecked is shown.
+   * @returns {Promise<{ mode: "checked" | "source_only" | "audit", generated_sentences: boolean, source: "trooth" | "last_read" | "fail_closed" }>}
+   */
+  async answerMode() {
+    await this.ensureFresh();
+    if (this.file && this.now() - this.modeReadAt >= this.refreshMs) {
+      try {
+        const m = await this.json(`${this.apiBase}/public/semanto/${encodeURIComponent(this.file.header.trooth_id)}/answer-mode`);
+        if (ANSWER_MODES.includes(m.mode)) this.modeSetting = { mode: m.mode, generated_sentences: m.generated_sentences === true };
+        this.modeReadAt = this.now();
+        this.modeFresh = true;
+      } catch (e) {
+        this.modeFresh = false;
+        this.modeReadAt = this.now();
+        this.log("trooth_api_unreachable", `The answer mode could not be read (${e.message}); ${this.modeSetting ? `${this.modeSetting.mode} stays in force` : "Checked is used until it can be read"}.`);
+      }
+    }
+    if (this.modeSetting) return { ...this.modeSetting, source: this.modeFresh ? "trooth" : "last_read" };
+    return { mode: "checked", generated_sentences: false, source: "fail_closed" };
+  }
+
+  /**
+   * The reply a chatbot sends, in the company's answer mode (or `mode` when given):
+   *   checked      built by code from the signed record (see reply); the draft is discarded.
+   *   source_only  the draft as written; nothing is checked.
+   *   audit        the draft as written; it is checked after it is sent, and the result arrives as an "audit" event and
+   *                in `audit` (a promise).
+   * @param {{ fact_id?: string, question?: string, draft?: string, mode?: "checked" | "source_only" | "audit" }} input
+   */
+  async respond(input) {
+    const { mode: asked, draft = "", ...q } = input;
+    const mode = asked && ANSWER_MODES.includes(asked) ? asked : (await this.answerMode()).mode;
+    if (mode === "checked") return { mode, ...(await this.reply({ ...q, draft })) };
+    if (mode === "source_only") return { mode, status: "unchecked", text: draft };
+    const audit = this.answer(q).then((a) => {
+      const result = auditDraft(a, draft, this.file);
+      this.log("audit", `${result.result}: ${q.question ?? q.fact_id ?? ""}`.trim());
+      return result;
+    });
+    return { mode, status: "unchecked", text: draft, audit };
+  }
+}
+
+/**
+ * Audit mode's check of a sent draft against the answer for the same question: "supported" when the draft carries the
+ * signed sentence or its value, "differs" when a single signed fact answers and the draft carries neither (the signed
+ * sentence comes with it), "marked" for a fact marked changed or expired, "not_in_record" when the record holds nothing
+ * for it, and "not_checked" for candidates or no version. `file` (the checked signed copy) lets an untyped fact's value count.
+ */
+export function auditDraft(a, draft, file = null) {
+  if (a.status !== "answer") return { result: a.status === "not_published" ? "not_in_record" : "not_checked", fact_id: null, statement: null };
+  const f = a.facts[0];
+  if (f.mark) return { result: "marked", fact_id: f.fact_id, statement: null, words: MARK_WORDS[f.mark] };
+  const norm = (s) => String(s).toLowerCase().normalize("NFKC").replace(/\s+/g, " ");
+  const d = norm(draft);
+  const raw = file?.facts?.find((x) => x.id === f.fact_id);
+  const value = f.typed?.value ?? raw?.typed?.value ?? raw?.value;
+  const values = (Array.isArray(value) ? value : value === undefined || value === null ? [] : [value]).map(String);
+  const supported = d.includes(norm(f.statement)) || (values.length > 0 && values.every((v) => d.includes(norm(v))));
+  return { result: supported ? "supported" : "differs", fact_id: f.fact_id, statement: f.statement };
 }
