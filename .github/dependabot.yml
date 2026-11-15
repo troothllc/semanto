@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 Trooth, LLC
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+  - package-ecosystem: pip
+    directory: /verifier/python
+    schedule: { interval: weekly }
+  - package-ecosystem: gomod
+    directory: /verifier/go
+    schedule: { interval: weekly }

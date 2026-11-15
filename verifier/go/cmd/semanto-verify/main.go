@@ -189,7 +189,7 @@ func cmdFile(args []string) int {
 	fs := flag.NewFlagSet("file", flag.ExitOnError)
 	pagesDir := fs.String("pages", "", "folder holding <page id>.md files")
 	keysPath := fs.String("keys", "", "keys json (JWK Sets)")
-	nowS := fs.String("now", "", "instant to judge validity at, ISO 8601 UTC")
+	nowS := fs.String("now", "", "time to judge validity at, ISO 8601 UTC")
 	revPath := fs.String("revocations", "", "signed revocation list json")
 	offline := fs.Bool("offline", false, "never fetch keys")
 	trooth := fs.String("trooth", "", "Trooth API base")
@@ -264,7 +264,7 @@ func cmdFile(args []string) int {
 func cmdResponse(args []string, alsoProof bool) int {
 	fs := flag.NewFlagSet("response", flag.ExitOnError)
 	keysPath := fs.String("keys", "", "keys json")
-	nowS := fs.String("now", "", "instant to judge validity at")
+	nowS := fs.String("now", "", "time to judge validity at")
 	trooth := fs.String("trooth", "", "Trooth API base")
 	allowUnwitnessed := fs.Bool("allow-unwitnessed", false, "accept a proof with no witness statement")
 	allowUnlogged := fs.Bool("allow-unlogged", false, "accept a proof with no log entry")
@@ -346,7 +346,7 @@ func cmdLog(args []string) int {
 	to := fs.Int("to", -1, "newer tree size")
 	logURL := fs.String("log", defaultLog, "log base url")
 	keysPath := fs.String("keys", "", "keys json")
-	nowS := fs.String("now", "", "instant to judge validity at")
+	nowS := fs.String("now", "", "time to judge validity at")
 	trooth := fs.String("trooth", troothKeysBase, "Trooth key base")
 	_, _ = semanto.ParseInterspersed(fs, args)
 	if *from < 0 || *to < *from {

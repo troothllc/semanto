@@ -37,6 +37,8 @@ export const JWS_TYPES = {
   revocation: "https://trooth.co/types/revocation-list",
   contentSignals: "https://trooth.co/types/content-signals",
   sellerList: "https://trooth.co/types/seller-list",
+  captureRoot: "https://trooth.co/types/capture-root",
+  answerReceipt: "https://trooth.co/types/answer-receipt",
 };
 
 export const SEMANTO_RESPONSE_COMPONENTS = ["@status", "content-type", "content-digest", "trooth-semanto-version", "trooth-page-hash"];
@@ -966,8 +968,19 @@ export async function verifyResponse(status, headers, body, keys = {}, opts = {}
   const bytes = typeof body === "string" ? utf8(body) : body;
   const digestOk = await verifyContentDigest(headerGet(headers, "content-digest"), bytes);
   c.add("content_digest", digestOk, digestOk ? "Content-Digest matches the body." : "Content-Digest does not match the body, or is missing.", "content_digest_mismatch");
-  const v = await verifyMessage({ kind: "response", status, headers }, { resolveKey: resolve, required: opts.required ?? SEMANTO_RESPONSE_COMPONENTS, tag: opts.tag ?? SEMANTO_RESPONSE_TAG, now: nowSec, maxAgeSeconds: opts.maxAgeSeconds, skewSeconds: opts.skewSeconds });
-  c.add("signature", v.ok, v.ok ? `The response is signed by the ${role === "trooth" ? "Trooth" : "company"} key ${v.keyid} with tag ${v.params.tag}, covering ${v.components.join(", ")}.` : `The response signature did not check out against the ${role === "trooth" ? "Trooth" : "company"} keys: ${v.reason}.`, v.ok ? undefined : v.reason);
+  const msgOpts = { resolveKey: resolve, required: opts.required ?? SEMANTO_RESPONSE_COMPONENTS, tag: opts.tag ?? SEMANTO_RESPONSE_TAG, now: nowSec, maxAgeSeconds: opts.maxAgeSeconds, skewSeconds: opts.skewSeconds };
+  let v = await verifyMessage({ kind: "response", status, headers }, msgOpts);
+  // a cached copy past its signature's lifetime keeps failing with reason "expired" (a reader must not take it as
+  // fresh), and says in state whether the signature checked out while it was valid: valid_header_signature_expired.
+  let stale = false;
+  if (!v.ok && v.reason === "expired") {
+    const exps = Object.values(parseSignatureInput(headerGet(headers, "signature-input") ?? "")).map((e) => e.params.expires).filter((x) => Number.isInteger(x));
+    if (exps.length) {
+      const again = await verifyMessage({ kind: "response", status, headers }, { ...msgOpts, now: Math.max(...exps) - 1, maxAgeSeconds: undefined });
+      if (again.ok) stale = true;
+    }
+  }
+  c.add("signature", v.ok, v.ok ? `The response is signed by the ${role === "trooth" ? "Trooth" : "company"} key ${v.keyid} with tag ${v.params.tag}, covering ${v.components.join(", ")}.` : stale ? "The response signature checked out while it was valid and its lifetime has ended: a cached copy, valid with an expired header signature." : `The response signature did not check out against the ${role === "trooth" ? "Trooth" : "company"} keys: ${v.reason}.`, v.ok ? undefined : v.reason);
   if (v.ok) {
     v.notes.forEach((n) => c.note(`Response signature: ${n}.`));
     const covered = v.components.map((x) => x.toLowerCase());
@@ -979,7 +992,7 @@ export async function verifyResponse(status, headers, body, keys = {}, opts = {}
   const d = await digest(bytes);
   c.add("page_hash", pageHash === d, pageHash === d ? `Trooth-Page-Hash is the digest of the body: ${d}` : pageHash ? `Trooth-Page-Hash ${pageHash} is not the digest of the body (${d}).` : "The response carries no Trooth-Page-Hash.", "page_hash_mismatch");
   const signedPageHash = headerGet(headers, "trooth-signed-page-hash");
-  return c.result({ keyid: v.ok ? v.keyid : null, params: v.ok ? v.params : null, signed_by: role, version: headerGet(headers, "trooth-semanto-version"), page_hash: pageHash, signed_page_hash: signedPageHash });
+  return c.result({ keyid: v.ok ? v.keyid : null, params: v.ok ? v.params : null, signed_by: role, version: headerGet(headers, "trooth-semanto-version"), page_hash: pageHash, signed_page_hash: signedPageHash, ...(stale ? { state: "valid_header_signature_expired" } : {}) });
 }
 
 /** Verify a Web Bot Auth signed request against the agent's keys. Returns the Signature-Agent it names when it checks out. */
@@ -1107,4 +1120,42 @@ export function parseLink(value) {
     out.push({ url: m[1], params });
   }
   return out;
+}
+
+/**
+ * an evidence bundle checked offline, with no call to Trooth: the signed copy and its pages (verifySemanto),
+ * the copy's entry in Trooth's public log (the leaf recomputed, the inclusion path to the tree head, the tree head
+ * signed by Trooth), and each day's read digest signed by Trooth. bundle = { file, pages: { url: bytes }, keys,
+ * inclusion, digests: [{ digest, jws }] }, as GET /os/semanto/{id}/evidence lays them out.
+ */
+export async function verifyEvidence(bundle, opts = {}) {
+  const c = new Checks();
+  const at = atOf(opts);
+  const keys = bundle.keys ?? {};
+  const copy = await verifySemanto(bundle.file, bundle.pages ?? {}, keys, opts);
+  c.add("signed_copy", copy.ok, copy.ok ? "The signed copy, its pages and its signatures check out." : `The signed copy did not check out: ${copy.reason}.`, copy.reason ?? undefined);
+  const inc = bundle.inclusion;
+  if (inc && inc.leaf) {
+    const recomputed = toHex(await leafHash(utf8(canonicalize(inc.leaf))));
+    const leafOk = recomputed === String(inc.leaf_hash).slice(7) && inc.leaf.hash === bundle.file?.root_hash && inc.leaf.kind === "semanto_version";
+    c.add("log_leaf", leafOk, leafOk ? "The log leaf is the canonical record of this copy's root_hash." : "The log leaf does not name this copy.", "log_leaf_mismatch");
+    let inLog = false;
+    try {
+      inLog = await verifyInclusionInLog(inc);
+    } catch {
+      inLog = false;
+    }
+    c.add("log_inclusion", inLog, inLog ? `Leaf ${inc.index} is in the log of size ${inc.tree_size}.` : "The inclusion path does not lead to the tree head.", "log_inclusion_failed");
+    const th = await verifyTreeHead(inc.tree_head_jws, keys, { now: at });
+    const same = th.ok && th.tree_size === inc.tree_size && th.root_hash === inc.root_hash;
+    c.add("tree_head", same, same ? `The tree head of size ${th.tree_size} is signed by Trooth (key ${th.kid}).` : `The tree head did not check out: ${th.ok ? "it names another tree" : th.reason}.`, "tree_head_failed");
+  } else c.add("log", false, "The bundle carries no log entry.", "log_absent");
+  const troothKey = strictRoleResolver(keys, "trooth");
+  let days = 0;
+  for (const d of bundle.digests ?? []) {
+    const v = await verifyJws(d.jws, troothKey, { expectTyp: JWS_TYPES.readReceipt, payload: d.digest, at });
+    c.add(`reads_${d.digest?.day ?? "day"}`, v.ok, v.ok ? `Reads on ${d.digest.day}: ${d.digest.total}, signed by Trooth.` : `The read digest for ${d.digest?.day} did not check out: ${v.reason}.`, `digest_${v.reason}`);
+    days++;
+  }
+  return c.result({ days });
 }

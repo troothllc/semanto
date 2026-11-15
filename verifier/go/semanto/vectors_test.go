@@ -82,7 +82,7 @@ func run(t *testing.T, v map[string]any, keys KeySet, semanto map[string]any) ou
 		}
 		nowEpoch, _ := getInt(v, "now_epoch")
 		r := VerifyResponse(status, headers, []byte(getStr(resp, "body")), keys, time.Unix(int64(nowEpoch), 0), ResponseOptions{})
-		return outcome{ok: r.OK, reason: r.Reason, keyid: r.KeyID}
+		return outcome{ok: r.OK, reason: r.Reason, keyid: r.KeyID, state: r.State}
 	case "web-bot-auth-request":
 		req := getMap(v, "request")
 		headers := map[string]string{}
@@ -120,6 +120,9 @@ func run(t *testing.T, v map[string]any, keys KeySet, semanto map[string]any) ou
 		return outcome{ok: true}
 	case "pages":
 		return outcome{ok: true}
+	case "page-bytes":
+		// the bytes are checked against the signed hash; what the text says changes nothing.
+		return outcome{ok: Digest([]byte(getStr(v, "markdown"))) == getStr(v, "hash")}
 	}
 	t.Fatalf("unknown vector kind %q", getStr(v, "kind"))
 	return outcome{}
@@ -319,7 +322,7 @@ func TestStateOf(t *testing.T) {
 
 // The kit's registry names every JWS type Semanto signs, marketplaceCatalog and sellerList included.
 func TestJWSTypesIncludeEveryCoreType(t *testing.T) {
-	if JWSTypes["marketplaceCatalog"] != "https://trooth.co/types/marketplace-catalog" || JWSTypes["sellerList"] != "https://trooth.co/types/seller-list" || len(JWSTypes) != 14 {
+	if JWSTypes["marketplaceCatalog"] != "https://trooth.co/types/marketplace-catalog" || JWSTypes["sellerList"] != "https://trooth.co/types/seller-list" || len(JWSTypes) != 16 {
 		t.Fatalf("JWSTypes: %v", JWSTypes)
 	}
 }

@@ -3,7 +3,7 @@
 //
 // The top-level Semanto checks: a whole file offline, a per-page proof, a
 // signed response, tree heads, log inclusion and consistency, checkpoints,
-// offers, revocation lists, and the state of a version at an instant. Results
+// offers, revocation lists, and the state of a version at a given time. Results
 // are lists of named checks in plain words; nothing here produces a number or
 // a verdict about a company.
 package semanto
@@ -690,7 +690,26 @@ func VerifyResponse(status int, headers map[string]string, body []byte, keys Key
 		req = SemantoResponseComponents
 	}
 	v := VerifyMessage(Message{Kind: "response", Status: status, Headers: headers}, keys.Role(role), VerifyOptions{Required: req, Tag: tag, Now: now.Unix(), MaxAgeSeconds: opts.MaxAgeSeconds})
-	c.add("signature", v.OK, ternary(v.OK, "The response is signed by the "+who+" key "+v.KeyID+" with tag "+v.Params.Tag+", covering "+strings.Join(v.Components, ", ")+".", "The response signature did not check out against the "+who+" keys: "+v.Reason+"."), v.Reason)
+	// a cached copy past its signature's lifetime keeps reason "expired" and says in State whether the signature
+	// checked out while it was valid.
+	stale := false
+	if !v.OK && v.Reason == "expired" {
+		si, _ := HeaderGet(headers, "signature-input")
+		var latest int64
+		for _, e := range ParseSignatureInput(si) {
+			if e.Params.HasExp && e.Params.Expires > latest {
+				latest = e.Params.Expires
+			}
+		}
+		if latest > 0 {
+			stale = VerifyMessage(Message{Kind: "response", Status: status, Headers: headers}, keys.Role(role), VerifyOptions{Required: req, Tag: tag, Now: latest - 1}).OK
+		}
+	}
+	failed := "The response signature did not check out against the " + who + " keys: " + v.Reason + "."
+	if stale {
+		failed = "The response signature checked out while it was valid and its lifetime has ended: a cached copy, valid with an expired header signature."
+	}
+	c.add("signature", v.OK, ternary(v.OK, "The response is signed by the "+who+" key "+v.KeyID+" with tag "+v.Params.Tag+", covering "+strings.Join(v.Components, ", ")+".", failed), v.Reason)
 	if v.OK {
 		c.addNotes("Response signature: ", v.Notes)
 		covered := map[string]bool{}
@@ -723,6 +742,9 @@ func VerifyResponse(status int, headers map[string]string, body []byte, keys Key
 	r.SignedBy = role
 	if v.OK {
 		r.KeyID = v.KeyID
+	}
+	if stale {
+		r.State = "valid_header_signature_expired"
 	}
 	return r
 }

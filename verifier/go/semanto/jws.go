@@ -31,6 +31,8 @@ var JWSTypes = map[string]string{
 	"revocation":         "https://trooth.co/types/revocation-list",
 	"contentSignals":     "https://trooth.co/types/content-signals",
 	"sellerList":         "https://trooth.co/types/seller-list",
+	"captureRoot":        "https://trooth.co/types/capture-root",
+	"answerReceipt":      "https://trooth.co/types/answer-receipt",
 }
 
 // JWK is an Ed25519 public key as published in a JWK Set.

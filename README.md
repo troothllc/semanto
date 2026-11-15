@@ -1,42 +1,94 @@
-# Semanto by Trooth
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- Copyright (c) 2026 Trooth, LLC -->
 
-[![PyPI version](https://img.shields.io/pypi/v/trooth.svg?label=pypi)](https://pypi.org/project/trooth/)
+# Semanto
 
-Semanto makes AI answers about your company more accurate. It turns a company's website into one signed copy that AI agents can read and check. Each page carries a signature from the company's own key, and every published version is entered in a public log, so anyone can confirm what a company said and when it said it.
+[![npm](https://img.shields.io/npm/v/@trooth/semanto-verify.svg)](https://www.npmjs.com/package/@trooth/semanto-verify)
+[![PyPI](https://img.shields.io/pypi/v/trooth.svg)](https://pypi.org/project/trooth/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/troothllc/semanto/verifier/go.svg)](https://pkg.go.dev/github.com/troothllc/semanto/verifier/go)
+[![CI](https://github.com/troothllc/semanto/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/troothllc/semanto/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/troothllc/semanto/badge)](https://scorecard.dev/viewer/?uri=github.com/troothllc/semanto)
 
-This repository holds the open readers for Python, JavaScript and Go with their shared test vectors, and the Cloudflare adapter a company deploys on its own domain. The Semanto service itself is Trooth's and is not here.
+Semanto turns a company's website into one signed copy that AI agents can read and check. This repository holds the open parts: the verifiers that check a signed copy with no account and no call to Trooth, the shared test vectors they all pass, the GitHub Action that builds a new version after each deploy, and the Cloudflare adapter a company deploys on its own domain.
+
+A check says who published a page, when, that it has not changed since, and that it was recorded in Trooth's public log. It does not say the content is true.
 
 ## Documentation
 
-The documentation is at [trooth.co/docs/semanto](https://trooth.co/docs/semanto), with [install guides](https://trooth.co/docs/semanto#install) for Cloudflare, Vercel, Netlify, Fastly, Akamai, Gcore, nginx, Apache, WordPress, Shopify, Webflow and Squarespace.
+See the [Semanto docs](https://trooth.co/docs/semanto) on trooth.co, with [install guides](https://trooth.co/docs/semanto#install) for Cloudflare, Vercel, Netlify, Fastly, Akamai, Gcore, nginx, Apache, WordPress, Shopify, Webflow and Squarespace.
 
-## Readers
+## Directory
 
-| Reader | Path | Install |
+| Package | What it is | Install |
 | --- | --- | --- |
-| Python | [`verifier/python`](verifier/python) | `pip install trooth` |
-| JavaScript | [`verifier/js`](verifier/js) | Copy `verify.mjs`; Node 20 or newer, no dependencies |
-| Go | [`verifier/go`](verifier/go) | `go install github.com/troothllc/semanto/verifier/go/cmd/semanto-verify@latest` |
+| [`verifier/js`](verifier/js) | `@trooth/semanto-verify`: the JavaScript verifier and the `semanto-verify` command. No dependencies, WebCrypto only. | `npm install @trooth/semanto-verify` |
+| [`verifier/python`](verifier/python) | `trooth`: the Python verifier, `SemantoClient`, the `semanto-verify` command and LangChain, LlamaIndex and OpenAI Agents extras. | `pip install trooth` |
+| [`verifier/go`](verifier/go) | `github.com/troothllc/semanto/verifier/go`: the Go verifier and `cmd/semanto-verify`. Standard library only. | `go get github.com/troothllc/semanto/verifier/go` |
+| [`verifier/test-vectors/v1`](verifier/test-vectors/v1) | The vectors every verifier runs, positive and negative, each with what it must conclude. | |
+| [`deploy/cloudflare`](deploy/cloudflare) | The Cloudflare adapter: serves the signed copy on your own domain. | [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/troothllc/semanto/tree/main/deploy/cloudflare) |
+| [`action.yml`](action.yml) | Semanto on deploy: after a push, Semanto reads the site again and builds a new version, which waits for a person to sign it. | `uses: troothllc/semanto@v1` |
 
-```python
-from trooth import SemantoClient
+## Requirements
 
-r = SemantoClient().read("https://acme.com/pricing")
-print(r["ok"], r["reason"])
+Node.js 20 or later, Python 3.11 or later, or Go 1.22 or later.
+
+## Quick start
+
+Check a signed page from the command line:
+
+```sh
+npx @trooth/semanto-verify page https://trooth.co/about
 ```
 
-All three share the same functions, reason codes and the vectors in [`verifier/test-vectors/v1`](verifier/test-vectors/v1).
+Or in code:
+
+```js
+import { verifySemanto } from "@trooth/semanto-verify";
+```
+
+```python
+from trooth_semanto_verify import verify_semanto
+```
+
+```go
+import "github.com/troothllc/semanto/verifier/go/semanto"
+```
+
+Each verifier checks, in order: the page bytes against the signed manifest, the page's inclusion proof, the company's signature with a key bound to its domain by `_trooth` DNS, Trooth's witness statement, the public log's inclusion and consistency proofs, the response signature (RFC 9421), and the version's window and revocation state. [`verifier/README.md`](verifier/README.md) says what each step proves.
+
+## Semanto on deploy
+
+```yaml
+- uses: troothllc/semanto@v1
+  with:
+    trooth-id: your-trooth-id
+    api-key: ${{ secrets.TROOTH_API_KEY }}
+```
+
+The key is an agent key from [trooth.co/dashboard/api-keys](https://trooth.co/dashboard/api-keys). Building is an agent's step; signing stays a person's, on trooth.co. Nothing is published from CI.
 
 ## Cloudflare
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/troothllc/semanto/tree/main/deploy/cloudflare)
 
-See [`deploy/cloudflare`](deploy/cloudflare).
+The deploy page asks for one value, your Trooth ID. See [`deploy/cloudflare`](deploy/cloudflare).
 
-## Licenses
+## Versioning
 
-The readers are Apache-2.0. The Cloudflare adapter is under the Trooth Adapter License 1.0: run and change it to serve Semanto for domains you control. [LICENSE.md](LICENSE.md) has both.
+Each package follows Semantic Versioning and keeps its own changelog: [JavaScript](verifier/js/CHANGELOG.md), [Python](verifier/python/CHANGELOG.md), [Go](verifier/go/CHANGELOG.md). Releases are tagged `js-v<version>`, `python-v<version>` and `verifier/go/v<version>`, published from this repository's workflows with provenance, and signed.
+
+## Support
+
+Ask on [trooth.co/contact](https://trooth.co/contact). Report a bug in this repository's [issues](https://github.com/troothllc/semanto/issues/new/choose).
 
 ## Security
 
-Report a vulnerability to security@trooth.co. Please do not open a public issue for it.
+Do not open a public issue for a vulnerability. See [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+The verifiers, the test vectors, the Action and the repository tooling are Apache License 2.0 ([`verifier/LICENSE`](verifier/LICENSE)). The Cloudflare adapter is under the Trooth Adapter License 1.0: run and change it to serve Semanto for domains you control. [LICENSE.md](LICENSE.md) has the full table. The Semanto service, its dashboard and its build pipeline are proprietary to Trooth, LLC and are not in this repository.
