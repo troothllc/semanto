@@ -5,10 +5,14 @@
     from trooth import SemantoClient
     r = SemantoClient().read("https://acme.com/pricing")
 
+    from trooth import SemantoSource
+    a = SemantoSource("acme.com").answer(question="What is your phone number?")
+
 The checks themselves live in trooth_semanto_verify (the same functions and reason codes as the JavaScript and Go
 kits). Framework integrations are optional extras: trooth[langchain], trooth[llama-index], trooth[openai-agents].
 """
 from trooth_semanto_verify.client import SemantoClient
+from trooth_semanto_verify.source import SemantoSource
 
-__version__ = "0.1.1"
-__all__ = ["SemantoClient", "__version__"]
+__version__ = "0.2.0"
+__all__ = ["SemantoClient", "SemantoSource", "__version__"]

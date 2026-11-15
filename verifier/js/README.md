@@ -40,3 +40,16 @@ if (r.ok) console.log(r.text); else console.log(r.reason, r.checks);
 ```
 
 `r.dns` is `true` when the domain's DNS names the signing key, `false` when it names another, `null` when DNS could not be asked.
+
+## SemantoSource
+
+`source.mjs` answers value questions from a company's own signed copy, in process. It loads `/.well-known/trooth.semanto` and the company's keys from the company's site, checks the file once for each new body, reads the site again at most every 15 minutes, and answers with the same matcher as Trooth's service (`answer.mjs`, whose answers are compared case by case with `verifier/test-vectors/answer-v1`).
+
+```js
+import { SemantoSource } from "@trooth/semanto-verify/source";
+const acme = new SemantoSource("acme.com", { onEvent: (e) => console.log(e.event, e.detail) });
+const a = await acme.answer({ question: "How much is the Starter plan?" });
+// a.status: "answer" | "candidates" | "not_published" | "not_read"; a.text is the signed sentence and the check link
+```
+
+Trooth's API is used only for Trooth's witness keys and the monitor's marks. When it cannot be reached, answers keep coming from the last version that checked out and the source logs `trooth_api_unreachable`. A new version that does not check out is refused (`version_refused`) and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.

@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
-      - run: node --test verifier/js/test/vectors.test.mjs
+      - run: node --test verifier/js/test/vectors.test.mjs verifier/js/test/source.test.mjs
 
   python:
     name: Python (${{ matrix.python }})
@@ -52,7 +52,7 @@ jobs:
       - run: |
           python3 -m pip install --upgrade pip pytest
           python3 -m pip install ".[langchain,llama-index,openai-agents]"
-          python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py
+          python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py
 
   go:
     name: Go (${{ matrix.go }})

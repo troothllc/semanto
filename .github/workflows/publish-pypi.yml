@@ -45,7 +45,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip build twine pytest
           python3 -m pip install ".[langchain,llama-index,openai-agents]"
-          python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py
+          python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py
       - name: Build the wheel and sdist
         run: |
           python3 -m build
