@@ -1,8 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 Trooth, LLC
 #
-# Publishes @trooth/semanto-verify (verifier/js) to npm on a tag js-v<version>, by npm trusted publishing (OIDC: no
-# token is stored), with npm provenance, a cosign keyless signature and GitHub build provenance on the release files.
+# Stages @trooth/semanto-verify (verifier/js) on npm on a tag js-v<version>, by npm trusted publishing (OIDC: no
+# token is stored). The trusted publisher is stage-only: a maintainer approves each staged version with 2FA on
+# npmjs.com before it goes out. Each release carries npm provenance, a cosign keyless signature and GitHub build
+# provenance on the release files.
 name: Publish @trooth/semanto-verify
 
 on:
@@ -38,8 +40,8 @@ jobs:
         with:
           node-version: 24
           registry-url: "https://registry.npmjs.org"
-      - name: npm 11.5.1 or later (trusted publishing needs it)
-        run: npm install -g npm@^11.5.1
+      - name: npm 11.15.0 or later (staged publishing needs it)
+        run: npm install -g npm@^11.15.0
       - name: The tag is the package version
         run: |
           V="$(node -p "require('./package.json').version")"
@@ -49,7 +51,7 @@ jobs:
       - name: Pack once; this file is the one published and signed
         run: mkdir -p ../../release && npm pack --pack-destination ../../release
       - name: Publish with provenance
-        run: npm publish ../../release/trooth-semanto-verify-*.tgz --provenance --access public
+        run: npm stage publish ../../release/trooth-semanto-verify-*.tgz --provenance --access public
       - uses: sigstore/cosign-installer@v3
       - name: Checksums and a keyless signature for each release file
         working-directory: release

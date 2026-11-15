@@ -75,7 +75,7 @@ The deploy page asks for one value, your Trooth ID. See [`deploy/cloudflare`](de
 
 ## Versioning
 
-Each package follows Semantic Versioning and keeps its own changelog: [JavaScript](verifier/js/CHANGELOG.md), [Python](verifier/python/CHANGELOG.md), [Go](verifier/go/CHANGELOG.md). Releases are tagged `js-v<version>`, `python-v<version>` and `verifier/go/v<version>`, published from this repository's workflows with provenance, and signed.
+Each package follows Semantic Versioning and keeps its own changelog: [JavaScript](verifier/js/CHANGELOG.md), [Python](verifier/python/CHANGELOG.md), [Go](verifier/go/CHANGELOG.md). Releases are tagged `js-v<version>`, `python-v<version>` and `verifier/go/v<version>`, published from this repository's workflows with provenance, and signed. npm releases are staged and go out only after a maintainer approves them with 2FA.
 
 ## Support
 
