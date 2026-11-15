@@ -48,7 +48,8 @@ export function addressesReader(line) {
 export function isLocked(f) {
   if (!f) return false;
   if (f.typed) return true;
-  return /^(pricing|commercial|contact|hours|privacy|policy|offer|terms|local)\b|price/.test(String(f.key ?? ""));
+  const key = String(f.key ?? "");
+  return /^(?:pricing|commercial|contact|hours|privacy|policy|offer|terms|local)\b/.test(key) || key.includes("price");
 }
 
 // ------------------------------------------------------------------ contact route and the not-published line
@@ -64,7 +65,53 @@ export function whenUnknown(file, org) {
   return w;
 }
 
-const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+const LOCAL = /[A-Za-z0-9._%+-]/;
+const HOST = /[A-Za-z0-9.-]/;
+
+/**
+ * The email addresses in a text, found in one pass (no backtracking): each "@" is widened to the characters an address
+ * may hold on either side, and kept when the part after it is a host name with a dot and a top-level name of letters.
+ * @returns {{ index: number, 0: string }[]}
+ */
+export function findEmails(text) {
+  const t = String(text ?? "");
+  const out = [];
+  let from = 0;
+  for (let at = t.indexOf("@"); at >= 0; at = t.indexOf("@", at + 1)) {
+    let i = at;
+    while (i > from && LOCAL.test(t[i - 1])) i--;
+    let j = at + 1;
+    while (j < t.length && HOST.test(t[j])) j++;
+    let host = t.slice(at + 1, j);
+    while (host.endsWith(".") || host.endsWith("-")) host = host.slice(0, -1);
+    const dot = host.lastIndexOf(".");
+    const tld = dot > 0 ? host.slice(dot + 1) : "";
+    if (i === at || dot <= 0 || tld.length < 2 || !/^[A-Za-z]+$/.test(tld) || host.startsWith(".") || host.includes("..")) continue;
+    const m = [t.slice(i, at + 1 + host.length)];
+    m.index = i;
+    out.push(m);
+    from = at + 1 + host.length;
+  }
+  return out;
+}
+
+/** Replace each email address in a text with fn(address). */
+function replaceEmails(text, fn) {
+  let out = "";
+  let at = 0;
+  for (const m of findEmails(text)) {
+    out += text.slice(at, m.index) + fn(m[0]);
+    at = m.index + m[0].length;
+  }
+  return out + text.slice(at);
+}
+
+/** "abc?!" without its trailing "?", "." and "!" (in one pass). */
+function trimMarks(s) {
+  let end = s.length;
+  while (end > 0 && "?.!".includes(s[end - 1])) end--;
+  return s.slice(0, end);
+}
 
 /**
  * The contact route from the record: an email, then a phone number, then a contact page, then the company's site.
@@ -75,7 +122,7 @@ export function contactRoute(file, domain) {
   const valueOf = (f) => f.typed?.value ?? f.value;
   const by = (re) => facts.filter((f) => re.test(f.key) && valueOf(f) != null);
   for (const f of [...by(/^contact\.support_email$/), ...by(/^contact\.(email|sales_email)$/)]) {
-    const m = String(valueOf(f)).match(EMAIL);
+    const m = findEmails(String(valueOf(f)))[0];
     if (m) return { kind: "email", value: m[0], href: `mailto:${m[0]}` };
   }
   for (const f of by(/^contact\.phone$|\.telephone$/)) {
@@ -191,7 +238,7 @@ export function completeQuestion(question, history = []) {
   }
   if (prev === null) return q;
   const extra = (q.match(/[\p{L}\p{N}'-]+/gu) ?? []).filter((w) => !REFERRING.has(w.toLowerCase()));
-  return extra.length ? `${prev.replace(/[?.!]+$/, "")} ${extra.join(" ")}?` : prev;
+  return extra.length ? `${trimMarks(prev)} ${extra.join(" ")}?` : prev;
 }
 
 // ------------------------------------------------------------------ the value check
@@ -223,7 +270,7 @@ export function valuesIn(text) {
     taken.push([i, j]);
     out.push({ kind, norm, raw: m[0] });
   };
-  for (const m of t.matchAll(EMAIL)) add("email", m[0].toLowerCase(), m);
+  for (const m of findEmails(t)) add("email", m[0].toLowerCase(), m);
   for (const m of t.matchAll(MONEY_A)) add("money", `${num(m[2])} ${CURRENCY[m[1].toLowerCase()] ?? m[1].toUpperCase()}`, m);
   for (const m of t.matchAll(MONEY_B)) add("money", `${num(m[1])} ${CURRENCY[m[2].toLowerCase()] ?? m[2].toUpperCase()}`, m);
   for (const m of t.matchAll(PERCENT)) add("percent", num(m[1]), m);
@@ -247,7 +294,7 @@ export function signedValues(file) {
     const tv = f.typed?.value ?? f.value;
     const kind = f.typed?.kind;
     if (kind === "phone" && tv != null) put({ kind: "phone", norm: String(tv).replace(/\D/g, "").slice(-10) });
-    if (typeof tv === "string") for (const m of tv.matchAll(EMAIL)) put({ kind: "email", norm: m[0].toLowerCase() });
+    if (typeof tv === "string") for (const m of findEmails(tv)) put({ kind: "email", norm: m[0].toLowerCase() });
   }
   return set;
 }
@@ -405,7 +452,7 @@ export function maskPersonal(text, file) {
   const t = String(text ?? "");
   const signed = signedValues(file);
   const recordText = [file?.header?.org ?? "", ...(file?.facts ?? []).flatMap((f) => [f.statement, ...(f.conditions ?? []), typeof f.value === "string" ? f.value : ""]), ...(file?.header?.pages_manifest ?? []).map((p) => p.title ?? "")].join(" \n ");
-  let out = t.replace(EMAIL, (m) => (signed.get("email")?.has(m.toLowerCase()) ? m : "[email]"));
+  let out = replaceEmails(t, (m) => (signed.get("email")?.has(m.toLowerCase()) ? m : "[email]"));
   out = out.replace(PHONE, (m) => {
     const d = m.replace(/\D/g, "");
     if (d.length < 7) return m;

@@ -15,6 +15,7 @@ export const LINES: {
   closed(org: string): string;
 };
 export function addressesReader(line: string): boolean;
+export function findEmails(text: string): ({ index: number; 0: string })[];
 export function isLocked(fact: object | null | undefined): boolean;
 export function whenUnknown(file: object | null, org: string): string;
 

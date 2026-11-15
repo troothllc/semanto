@@ -49,7 +49,7 @@ def addresses_reader(line: str) -> bool:
     return bool(_READER.search(s) or _IMPERATIVE.search(s))
 
 
-_LOCKED_KEY = re.compile(r"^(pricing|commercial|contact|hours|privacy|policy|offer|terms|local)\b|price")
+_LOCKED_KEY = re.compile(r"(?:pricing|commercial|contact|hours|privacy|policy|offer|terms|local)\b")
 
 
 def is_locked(f: Optional[dict]) -> bool:
@@ -58,7 +58,8 @@ def is_locked(f: Optional[dict]) -> bool:
         return False
     if f.get("typed"):
         return True
-    return bool(_LOCKED_KEY.search(str(f.get("key") or "")))
+    key = str(f.get("key") or "")
+    return bool(_LOCKED_KEY.match(key)) or "price" in key
 
 
 # ------------------------------------------------------------------ contact route and the not-published line
@@ -76,7 +77,53 @@ def when_unknown(file: Optional[dict], org: str) -> str:
     return w
 
 
-EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}")
+_LOCAL = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789._%+-")
+_HOST = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.-")
+
+
+class _Found:
+    def __init__(self, text: str, start: int):
+        self.text, self._start = text, start
+
+    def group(self, _: int = 0) -> str:
+        return self.text
+
+    def start(self) -> int:
+        return self._start
+
+    def end(self) -> int:
+        return self._start + len(self.text)
+
+
+def find_emails(text: Optional[str]) -> List[_Found]:
+    """The email addresses in a text, found in one pass (no backtracking), as turn.mjs findEmails."""
+    t = str(text or "")
+    out: List[_Found] = []
+    lo = 0
+    at = t.find("@")
+    while at >= 0:
+        i = at
+        while i > lo and t[i - 1] in _LOCAL:
+            i -= 1
+        j = at + 1
+        while j < len(t) and t[j] in _HOST:
+            j += 1
+        host = t[at + 1:j].rstrip(".-")
+        dot = host.rfind(".")
+        tld = host[dot + 1:] if dot > 0 else ""
+        if i < at and dot > 0 and len(tld) >= 2 and tld.isascii() and tld.isalpha() and not host.startswith(".") and ".." not in host:
+            out.append(_Found(t[i:at + 1 + len(host)], i))
+            lo = at + 1 + len(host)
+        at = t.find("@", at + 1)
+    return out
+
+
+def _replace_emails(text: str, fn: Callable[[str], str]) -> str:
+    out, at = [], 0
+    for m in find_emails(text):
+        out.append(text[at:m.start()] + fn(m.group(0)))
+        at = m.end()
+    return "".join(out) + text[at:]
 
 
 def _value_of(f: dict) -> Any:
@@ -89,7 +136,8 @@ def contact_route(file: Optional[dict], domain: str) -> dict:
     facts = (file or {}).get("facts") or []
     by = lambda rx: [f for f in facts if re.search(rx, f.get("key") or "") and _value_of(f) is not None]  # noqa: E731
     for f in by(r"^contact\.support_email$") + by(r"^contact\.(email|sales_email)$"):
-        m = EMAIL.search(str(_value_of(f)))
+        found = find_emails(str(_value_of(f)))
+        m = found[0] if found else None
         if m:
             return {"kind": "email", "value": m.group(0), "href": f"mailto:{m.group(0)}"}
     for f in by(r"^contact\.phone$|\.telephone$"):
@@ -200,7 +248,7 @@ def complete_question(question: Optional[str], history: Iterable[str] = ()) -> s
     if prev is None:
         return q
     extra = [w for w in _WORD_DASH.findall(q) if w.lower() not in _REFERRING]
-    return f"{re.sub(r'[?.!]+$', '', prev)} {' '.join(extra)}?" if extra else prev
+    return f"{prev.rstrip('?.!')} {' '.join(extra)}?" if extra else prev
 
 
 # ------------------------------------------------------------------ the value check
@@ -227,14 +275,14 @@ def values_in(text: Optional[str]) -> List[dict]:
     out: List[dict] = []
     taken: List[Tuple[int, int]] = []
 
-    def add(kind: str, norm: str, m: "re.Match[str]") -> None:
+    def add(kind: str, norm: str, m: Any) -> None:
         i, j = m.start(), m.end()
         if any(i < b and j > a for a, b in taken):
             return
         taken.append((i, j))
         out.append({"kind": kind, "norm": norm, "raw": m.group(0)})
 
-    for m in EMAIL.finditer(t):
+    for m in find_emails(t):
         add("email", m.group(0).lower(), m)
     for m in _MONEY_A.finditer(t):
         add("money", f"{_num(m.group(2))} {_CURRENCY.get(m.group(1).lower(), m.group(1).upper())}", m)
@@ -261,7 +309,7 @@ def signed_values(file: Optional[dict]) -> Dict[str, Set[str]]:
         if (f.get("typed") or {}).get("kind") == "phone" and tv is not None:
             out.setdefault("phone", set()).add(re.sub(r"\D", "", str(tv))[-10:])
         if isinstance(tv, str):
-            for m in EMAIL.finditer(tv):
+            for m in find_emails(tv):
                 out.setdefault("email", set()).add(m.group(0).lower())
     return out
 
@@ -428,7 +476,7 @@ def mask_personal(text: Optional[str], file: Optional[dict]) -> str:
         parts += [f.get("statement") or "", *(f.get("conditions") or []), f["value"] if isinstance(f.get("value"), str) else ""]
     parts += [p.get("title") or "" for p in header.get("pages_manifest") or []]
     record = " \n ".join(parts)
-    out = EMAIL.sub(lambda m: m.group(0) if m.group(0).lower() in signed.get("email", set()) else "[email]", t)
+    out = _replace_emails(t, lambda m: m if m.lower() in signed.get("email", set()) else "[email]")
 
     def phone(m: "re.Match[str]") -> str:
         d = re.sub(r"\D", "", m.group(0))
