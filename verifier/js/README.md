@@ -67,3 +67,33 @@ show(r.text);
 ```
 
 Trooth's API is used only for Trooth's witness keys, the monitor's marks and the answer mode. When it cannot be reached, answers keep coming from the last version that checked out and the source logs `trooth_api_unreachable`. A new version that does not check out is refused (`version_refused`) and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.
+
+## What the customer sees, turn by turn
+
+`reply` returns what a company's own chatbot shows for one turn, built by code (`turn.mjs`):
+
+| status | lines |
+| --- | --- |
+| `answer` | the signed sentence, its conditions, "From Acme Inc's signed record. Signed 2026-11-12. Check it: <link>" |
+| `not_published` | the company's not-published line and its contact route from the record |
+| `marked` | the mark (changed since signing, or expired) and the contact route; no value |
+| `choose` | several signed answers, as up to three `choices` |
+| `confirm` | a locked value found only by word overlap: up to three `choices` to pick before any value |
+| `closed` | no checked version, a withdrawn version or a revoked key: no value, the contact route; `onAlert` is called once |
+
+```js
+const r = await acme.reply({ question, history }); // history: earlier questions, used only to complete a follow-up
+if (r.status === "confirm") showChoices(r.choices); // then acme.reply({ fact_id, confirmed: true })
+else show(r.text);
+```
+
+`outputStep({ question, text })` checks an agent's final answer and replaces it with the checked reply when it carries
+a value the company did not sign. `quote({ question, select })` answers a free-form question with the company's own
+signed sentences, picked by ID by the company's model and printed by code. `stream(tokens)` releases a sentence only
+after its check. `maskPersonal(text, file)` masks emails, phone numbers and names that are not in the record.
+
+## Frameworks
+
+`frameworks.mjs` adds the three modes and the output step to the Vercel AI SDK (`semantoMiddleware`), LangChain.js and
+LlamaIndex.TS (`withSemanto`), the OpenAI Agents SDK (`semantoOutputGuardrail`) and plain HTTPS (`semantoHandler`, a
+fetch handler). Sample chatbots are in `verifier/examples/answer-path`.

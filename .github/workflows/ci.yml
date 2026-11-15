@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
-      - run: node --test verifier/js/test/vectors.test.mjs verifier/js/test/source.test.mjs
+      - run: node --test verifier/js/test/vectors.test.mjs verifier/js/test/source.test.mjs verifier/js/test/turn.test.mjs verifier/js/test/samples.test.mjs
 
   python:
     name: Python (${{ matrix.python }})
@@ -51,7 +51,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: |
           python3 -m pip install --require-hashes -r requirements-ci.txt
-          PYTHONPATH="$PWD" python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py
+          PYTHONPATH="$PWD" python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py test_turn.py test_samples.py
 
   go:
     name: Go (${{ matrix.go }})

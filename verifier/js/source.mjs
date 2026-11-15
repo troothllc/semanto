@@ -18,7 +18,7 @@
 // itself, and logs a "trooth_api_unreachable" event. A new version is adopted only when it checks out; until then the
 // last good one stays in use and the failure is logged. No dependencies; runs wherever fetch and WebCrypto do.
 
-import { trimEnd, verifySemanto } from "./verify.mjs";
+import { sha256Hex, stateOf, trimEnd, verifySemanto } from "./verify.mjs";
 
 /** "acme.com" from "acme.com", "https://acme.com/" or "acme.com/path"; no regex on the caller's string. */
 function hostOf(domain) {
@@ -27,7 +27,8 @@ function hostOf(domain) {
   const slash = d.indexOf("/");
   return slash < 0 ? d : d.slice(0, slash);
 }
-import { answer as answerFrom, assembleReply, factMarks, MARK_WORDS } from "./answer.mjs";
+import { answer as answerFrom, factMarks, MARK_WORDS } from "./answer.mjs";
+import { checkFinalAnswer, checkSentence, completeQuestion, customerReply, isLocked, maskPersonal, pageSentences, quoteAnswer, releaseChecked, signedValues } from "./turn.mjs";
 
 export const TROOTH_API = "https://api.trooth.co";
 export const MAX_REFRESH_SECONDS = 900;
@@ -59,6 +60,39 @@ export class SemantoSource {
     this.inflight = null;
     this.modeSetting = null;
     this.modeReadAt = 0;
+    /** Why no value may be shown (not_read, withdrawn, key_revoked, recheck_failed), or null. */
+    this.closed = null;
+    this.revocations = null;
+    this.alerted = new Set();
+    this.onAlert = opts.onAlert ?? null;
+    this.supportCheck = opts.supportCheck ?? null;
+    this.pageCache = new Map();
+  }
+
+  /**
+   * A source over a copy the caller already checked (verifySemanto) and keeps up to date itself: no site reads, no
+   * refresh. The marks are the date marks plus `changed`; the mode is `mode` (Checked when not given).
+   */
+  static fromChecked(file, opts = {}) {
+    const s = new SemantoSource(opts.domain ?? file.header?.domains?.[0] ?? file.header?.identity?.domain ?? "localhost", { ...opts, fetch: opts.fetch ?? (async () => { throw new Error("this source does not read the network"); }) });
+    s.file = file;
+    s.body = JSON.stringify(file);
+    s.company = { trooth_id: file.header.trooth_id, org: file.header.org, domain: s.domain };
+    s.changed = opts.changed ?? [];
+    s.checkedAt = Number.POSITIVE_INFINITY;
+    s.modeSetting = { mode: opts.mode ?? "checked", generated_sentences: false };
+    s.modeReadAt = Number.POSITIVE_INFINITY;
+    s.modeFresh = true;
+    return s;
+  }
+
+  /** Tell the owner, once per reason, that customers are getting the fail-closed or not-published reply. */
+  alert(reason, detail) {
+    if (this.alerted.has(reason)) return;
+    this.alerted.add(reason);
+    const e = { at: new Date(this.now()).toISOString(), event: "owner_alert", detail: `${reason}: ${detail}` };
+    this.log("owner_alert", e.detail);
+    if (this.onAlert) try { this.onAlert({ reason, detail, at: e.at }); } catch { /* the owner's hook must not stop a reply */ }
   }
 
   log(event, detail) {
@@ -133,8 +167,42 @@ export class SemantoSource {
         this.log("version_adopted", before === undefined ? `Version ${file.header.version} checked out and is in use.` : `Version ${file.header.version} checked out and replaces version ${before}.`);
       }
     }
-    if (this.file) await this.readMarks();
+    if (this.file) {
+      await this.recheck(body);
+      await this.readMarks();
+    }
     this.checkedAt = started;
+  }
+
+  /**
+   * Check the version in use again with the company's keys as served now and Trooth's revocation list: a withdrawn
+   * version or a key that no longer checks out closes the answer path (no value is shown) until a version checks out.
+   */
+  async recheck(body) {
+    const id = this.file.header.trooth_id;
+    try {
+      const r = await this.fetch(`${this.apiBase}/public/semanto/${encodeURIComponent(id)}/revocations`, { headers: { Accept: "application/json" } });
+      if (r.ok) this.revocations = (await r.json()).list ?? null;
+      else if (r.status === 404) this.revocations = null;
+      else throw new Error(`answered ${r.status}`);
+    } catch (e) {
+      this.log("trooth_api_unreachable", `The revocation list could not be read (${e.message}); the last one is used.`);
+    }
+    let company = null;
+    try {
+      company = await this.json(`https://${this.domain}/.well-known/trooth-keys.json`);
+    } catch {
+      company = null; // the site is down: keep the last result, the version itself already checked out
+    }
+    let closed = null;
+    if (stateOf(this.file, new Date(this.now()), this.revocations) === "withdrawn") closed = "withdrawn";
+    else if (company) {
+      const res = await verifySemanto(this.file, {}, { company, trooth: this.troothKeys ?? { keys: [] } }, { now: new Date(this.now()), revocations: this.revocations ?? undefined });
+      if (!res.ok && res.reason !== "witness_unverified" && this.troothKeys) closed = /key/.test(String(res.reason)) ? "key_revoked" : "recheck_failed";
+    } else closed = this.closed;
+    if (closed !== this.closed) this.log(closed ? "answer_path_closed" : "answer_path_open", closed ? `Version ${this.file.header.version}: ${closed}; no value is shown until a version checks out.` : `Version ${this.file.header.version} checks out again.`);
+    this.closed = closed;
+    void body;
   }
 
   async readMarks() {
@@ -173,12 +241,21 @@ export class SemantoSource {
   }
 
   /**
-   * The reply a chatbot shows for a question: built by code from the signed record, with the model's draft discarded.
-   * @param {{ fact_id?: string, question?: string, draft?: string }} input
+   * The reply a chatbot shows a customer for one turn, built by code from the signed record (turn.mjs customerReply);
+   * the model's draft is discarded. A follow-up is completed from `history` (earlier questions) and answered alone.
+   * Fails closed: with no checked version, a withdrawn version or a revoked key, no value is shown and the owner is
+   * alerted once. `confirmed: true` answers a locked value reached by word overlap (after the customer picked it).
+   * @param {{ fact_id?: string, question?: string, draft?: string, history?: string[], confirmed?: boolean }} input
    */
   async reply(input) {
-    const { draft, ...q } = input;
-    return assembleReply(await this.answer(q), draft);
+    const { draft, history, confirmed, ...q } = input;
+    if (q.question !== undefined && !q.fact_id) q.question = completeQuestion(q.question, history ?? []);
+    const a = await this.answer(q);
+    const closed = this.file ? this.closed : "not_read";
+    const r = customerReply(a, this.file, { draft, closed, domain: this.domain, confirmed });
+    if (r.status === "closed") this.alert(r.reason, `customers get the fail-closed reply for ${this.domain}`);
+    if (r.status === "marked") this.alert(`marked:${r.fact_id}`, `fact ${r.fact_id} is ${r.mark}; customers get the contact route instead of a value`);
+    return { ...r, question: q.question ?? null };
   }
 
   /**
@@ -213,9 +290,11 @@ export class SemantoSource {
    * @param {{ fact_id?: string, question?: string, draft?: string, mode?: "checked" | "source_only" | "audit" }} input
    */
   async respond(input) {
-    const { mode: asked, draft = "", ...q } = input;
+    const { mode: asked, draft = "", history, ...q } = input;
+    if (q.question !== undefined && !q.fact_id) q.question = completeQuestion(q.question, history ?? []);
     const mode = asked && ANSWER_MODES.includes(asked) ? asked : (await this.answerMode()).mode;
     if (mode === "checked") return { mode, ...(await this.reply({ ...q, draft })) };
+    if (q.confirmed !== undefined) delete q.confirmed;
     if (mode === "source_only") return { mode, status: "unchecked", text: draft };
     const audit = this.answer(q).then((a) => {
       const result = auditDraft(a, draft, this.file);
@@ -223,6 +302,90 @@ export class SemantoSource {
       return result;
     });
     return { mode, status: "unchecked", text: draft, audit };
+  }
+  /**
+   * The output step: run the value check on an agent's final answer before it is returned. When a value in it is not
+   * one the company signed, the answer is replaced by the checked reply for the question and `caught` lists the values.
+   * @param {{ question?: string, fact_id?: string, text: string, history?: string[] }} input
+   */
+  async outputStep(input) {
+    await this.ensureFresh();
+    if (!this.file || this.closed) return { ok: false, replaced: true, caught: [], reply: await this.reply({ question: input.question, fact_id: input.fact_id, history: input.history }), text: null };
+    const check = checkFinalAnswer(input.text, this.file);
+    if (check.ok) return { ok: true, replaced: false, caught: [], text: input.text };
+    this.log("altered_value_caught", `${check.caught.map((v) => v.raw).join(", ") || "an instruction"} in an answer to ${input.question ?? input.fact_id ?? "a question"}`);
+    const reply = await this.reply({ question: input.question, fact_id: input.fact_id, history: input.history, draft: input.text });
+    return { ok: false, replaced: true, caught: check.caught, instructions: check.instructions, reply, text: reply.text };
+  }
+
+  /** The signed pages of the version in use ({ id, title, url, text }), each checked against its hash in the manifest. */
+  async pages(ids = null) {
+    await this.ensureFresh();
+    if (!this.file) return [];
+    const out = [];
+    for (const p of this.file.header.pages_manifest ?? []) {
+      if (ids && !ids.includes(p.id)) continue;
+      const key = `${this.file.root_hash}|${p.id}`;
+      if (!this.pageCache.has(key)) {
+        try {
+          const r = await this.fetch(`${this.apiBase}/public/semanto/${encodeURIComponent(this.file.header.trooth_id)}/pages/${p.id}`, { headers: { Accept: "text/markdown" } });
+          if (!r.ok) throw new Error(`answered ${r.status}`);
+          const bytes = new Uint8Array(await r.arrayBuffer());
+          if (`sha256:${await sha256Hex(bytes)}` !== p.hash) throw new Error("its bytes do not match the signed hash");
+          this.pageCache.set(key, { id: p.id, title: p.title ?? null, url: p.url, text: new TextDecoder().decode(bytes) });
+        } catch (e) {
+          this.log("page_unreadable", `Page ${p.url} could not be used (${e.message}); its sentences are not quoted.`);
+          continue;
+        }
+      }
+      out.push(this.pageCache.get(key));
+    }
+    return out;
+  }
+
+  /**
+   * A free-form answer quoted from the company's signed pages: `select(question, sentences)` is the company's model,
+   * given the question and the signed sentences ({ id, page_id, text }), returning only { runs: [{ from, to }] } under
+   * SELECTION_SCHEMA. Code prints the runs unchanged and holds any sentence whose value is not the signed one.
+   * Personal details in the question are masked before the model sees it.
+   */
+  async quote({ question, select, pages = null }) {
+    await this.ensureFresh();
+    if (!this.file || this.closed) return customerReply({ status: "not_read", company: this.company, facts: [] }, this.file, { closed: this.file ? this.closed : "not_read", domain: this.domain });
+    const signedPages = pages ?? (await this.pages());
+    const sentences = signedPages.flatMap((p) => pageSentences(p));
+    let selection = null;
+    try {
+      selection = await select(maskPersonal(question, this.file), sentences);
+    } catch (e) {
+      this.log("model_failed", `The model gave no selection (${e.message}).`);
+    }
+    const q = quoteAnswer(this.file, signedPages, selection, { org: this.company.org, domain: this.domain });
+    if (q.held.length) this.log("sentences_held", `${q.held.length} sentence(s) held: ${q.held.map((h) => `${h.id} (${h.reason})`).join(", ")}`);
+    return q;
+  }
+
+  /**
+   * Stream an answer sentence by sentence; each sentence is released only after its check returns. With `supportCheck`
+   * set (opts), the masked sentence is sent there and must come back true as well.
+   * @param {AsyncIterable<string> | Iterable<string>} tokens
+   * @param {{ recording?: object[] }} [opts]
+   */
+  async *stream(tokens, opts = {}) {
+    await this.ensureFresh();
+    if (!this.file || this.closed) return;
+    const signed = signedValues(this.file);
+    const check = async (s) => {
+      if (!checkSentence(s, this.file, signed).ok) return false;
+      if (this.supportCheck) return (await this.supportCheck(maskPersonal(s, this.file))) === true;
+      return true;
+    };
+    yield* releaseChecked(tokens, check, { now: this.now, recording: opts.recording });
+  }
+
+  /** Whether a fact is answered only by code. */
+  locked(fact_id) {
+    return isLocked(this.file?.facts?.find((f) => f.id === fact_id));
   }
 }
 
