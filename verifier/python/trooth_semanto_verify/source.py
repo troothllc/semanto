@@ -22,18 +22,21 @@ from __future__ import annotations
 
 import json
 import threading
+import unicodedata
 import time
 import urllib.parse
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
 from .answer import answer as _answer
-from .answer import assemble_reply, fact_marks
+from .answer import MARK_WORDS, assemble_reply, fact_marks
 from .client import Fetch, urllib_fetch
 from .verify import verify_semanto
 
 TROOTH_API = "https://api.trooth.co"
 MAX_REFRESH_SECONDS = 900
+# The answer modes a company chooses on trooth.co (AP24).
+ANSWER_MODES = ("checked", "source_only", "audit")
 
 
 class SemantoSource:
@@ -58,6 +61,9 @@ class SemantoSource:
         self.checks = 0
         self._body: Optional[str] = None
         self._lock = threading.Lock()
+        self._mode: Optional[dict] = None
+        self._mode_read_at: Optional[float] = None
+        self._mode_fresh = False
 
     def _log(self, event: str, detail: str) -> None:
         e = {"at": datetime.fromtimestamp(self.now(), timezone.utc).isoformat().replace("+00:00", "Z"), "event": event, "detail": detail}
@@ -156,3 +162,55 @@ class SemantoSource:
     def reply(self, fact_id: Optional[str] = None, question: Optional[str] = None, draft: Optional[str] = None) -> dict:
         """The reply a chatbot shows for a question: built by code from the signed record, with the model's draft discarded."""
         return assemble_reply(self.answer(fact_id=fact_id, question=question), draft)
+
+    def answer_mode(self) -> dict:
+        """The company's answer mode, read from Trooth and kept between reads. When it has never been read (Trooth's API
+        unreachable from the start), Checked is used: the strictest mode, so nothing unchecked is shown."""
+        self.ensure_fresh()
+        if self.file and (self._mode_read_at is None or self.now() - self._mode_read_at >= self.refresh_seconds):
+            tid = urllib.parse.quote(self.file["header"]["trooth_id"], safe="")
+            try:
+                m = self._json(f"{self.api_base}/public/semanto/{tid}/answer-mode")
+                if m.get("mode") in ANSWER_MODES:
+                    self._mode = {"mode": m["mode"], "generated_sentences": m.get("generated_sentences") is True}
+                self._mode_fresh = True
+            except Exception as e:  # noqa: BLE001
+                self._mode_fresh = False
+                self._log("trooth_api_unreachable", f"The answer mode could not be read ({e}); {self._mode['mode'] + ' stays in force' if self._mode else 'Checked is used until it can be read'}.")
+            self._mode_read_at = self.now()
+        if self._mode:
+            return {**self._mode, "source": "trooth" if self._mode_fresh else "last_read"}
+        return {"mode": "checked", "generated_sentences": False, "source": "fail_closed"}
+
+    def respond(self, question: Optional[str] = None, draft: str = "", fact_id: Optional[str] = None, mode: Optional[str] = None) -> dict:
+        """The reply a chatbot sends, in the company's answer mode (or `mode` when given). checked: built by code from the
+        signed record, the draft discarded. source_only: the draft as written, nothing checked. audit: the draft as
+        written, checked right after; the result is in "audit" and in an "audit" event."""
+        m = mode if mode in ANSWER_MODES else self.answer_mode()["mode"]
+        if m == "checked":
+            return {"mode": m, **self.reply(fact_id=fact_id, question=question, draft=draft)}
+        if m == "source_only":
+            return {"mode": m, "status": "unchecked", "text": draft}
+        result = audit_draft(self.answer(fact_id=fact_id, question=question), draft, self.file)
+        self._log("audit", f"{result['result']}: {question or fact_id or ''}".strip())
+        return {"mode": m, "status": "unchecked", "text": draft, "audit": result}
+
+
+def audit_draft(a: dict, draft: str, file: Optional[dict] = None) -> dict:
+    """Audit mode's check of a sent draft against the answer for the same question: "supported" when the draft carries the
+    signed sentence or its value, "differs" when a single signed fact answers and the draft carries neither (the signed
+    sentence comes with it), "marked" for a fact marked changed or expired, "not_in_record" when the record holds nothing
+    for it, and "not_checked" for candidates or no version."""
+    if a["status"] != "answer":
+        return {"result": "not_in_record" if a["status"] == "not_published" else "not_checked", "fact_id": None, "statement": None}
+    f = a["facts"][0]
+    if f["mark"]:
+        return {"result": "marked", "fact_id": f["fact_id"], "statement": None, "words": MARK_WORDS[f["mark"]]}
+    norm = lambda s: " ".join(unicodedata.normalize("NFKC", str(s).lower()).split())  # noqa: E731
+    d = norm(draft)
+    raw = next((x for x in (file or {}).get("facts", []) if x["id"] == f["fact_id"]), None) or {}
+    typed = f.get("typed") or raw.get("typed") or {}
+    value = typed.get("value") if typed.get("value") is not None else raw.get("value")
+    values = [str(x) for x in (value if isinstance(value, list) else [] if value is None else [value])]
+    supported = norm(f["statement"]) in d or (len(values) > 0 and all(norm(v) in d for v in values))
+    return {"result": "supported" if supported else "differs", "fact_id": f["fact_id"], "statement": f["statement"]}

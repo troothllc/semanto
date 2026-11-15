@@ -10,8 +10,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { answer, assembleReply, factMarks, MATCHER, matcherId } from "../answer.mjs";
-import { SemantoSource, MAX_REFRESH_SECONDS } from "../source.mjs";
+import { answer, assembleReply, factMarks, MARK_WORDS, MATCHER, matcherId, notPublished } from "../answer.mjs";
+import { SemantoSource, MAX_REFRESH_SECONDS, auditDraft } from "../source.mjs";
 
 const dir = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "test-vectors");
 const readJson = (n) => JSON.parse(readFileSync(join(dir, n), "utf8"));
@@ -45,6 +45,7 @@ function site({ file = vec.file, apiDown = false, siteDown = false } = {}) {
       if (state.apiDown) throw new TypeError("fetch failed");
       if (url.endsWith("/trooth-keys.json")) return json(keys.trooth);
       if (url.endsWith("/facts/marks")) return json({ object: "semanto.fact_marks", version: state.file.header.version, marks: state.marks ?? [] });
+      if (url.endsWith("/answer-mode")) return json({ object: "semanto.answer_mode", mode: state.mode ?? "source_only", generated_sentences: false });
     }
     if (url.startsWith("https://acme.com/")) {
       if (state.siteDown) throw new TypeError("fetch failed");
@@ -198,4 +199,70 @@ test("reply() builds the shown text from the signed copy and discards the draft"
   const none = await s.reply({ question: "What is the weather?", draft: "Sunny." });
   assert.equal(none.status, "not_published");
   assert.ok(!none.text.includes("Sunny"));
+});
+
+test("Checked mode over the 200 fixed conversations shows only signed sentences and library lines", () => {
+  const v = readJson("answer-v1/answers.json");
+  const set = readJson("answer-v1/conversations.json");
+  assert.equal(set.conversations.length, 200);
+  const marks = factMarks(v.file, v.stored_marks.changed, new Date(v.now));
+  const statements = new Set(v.file.facts.map((f) => f.statement));
+  const conditions = new Set(v.file.facts.filter((f) => f.conditions?.length).map((f) => `Conditions: ${f.conditions.join("; ")}.`));
+  const fixed = new Set([...Object.values(MARK_WORDS), notPublished(v.company.org, v.company.domain)]);
+  const tail = /^(Signed on \d{4}-\d{2}-\d{2}\. )?Check: https:\/\/api\.trooth\.co\/public\/semanto\/acme\/versions\/7$/;
+  const candidates = /^\d+ signed facts of Acme Inc could answer this; none is picked\. Ask about one of them by its fact ID\.$/;
+  let lines = 0;
+  let turns = 0;
+  for (const c of set.conversations) for (const t of c.turns) {
+    turns += 1;
+    const r = assembleReply(answer(v.file, v.company, { question: t.question }, marks, { checkBase: v.check_base, signed_at: v.file.witness.at }), t.draft);
+    assert.ok(!r.text.includes(t.draft), `${c.id}: the draft was shown`);
+    for (const line of r.text.split("\n")) {
+      lines += 1;
+      assert.ok(statements.has(line) || conditions.has(line) || fixed.has(line) || tail.test(line) || candidates.test(line), `${c.id}: "${line}" is neither signed nor a library line`);
+    }
+  }
+  assert.ok(turns >= 600 && lines >= turns);
+});
+
+test("respond follows the company's mode: Checked builds by code, Source only passes the draft, Audit checks after sending", async () => {
+  const net = site();
+  const s = new SemantoSource("acme.com", { fetch: net.fetch, now: () => NOW });
+  const ask = { question: "How much is the Starter plan?", draft: "It is 19 USD a month." };
+  net.state.mode = "checked";
+  const checked = await s.respond(ask);
+  assert.equal(checked.mode, "checked");
+  assert.equal(checked.text.split("\n")[0], "The Starter plan costs 49 USD a month for up to 5 seats.");
+  const src = await s.respond({ ...ask, mode: "source_only" });
+  assert.deepEqual([src.status, src.text], ["unchecked", "It is 19 USD a month."]);
+  const aud = await s.respond({ ...ask, mode: "audit" });
+  assert.equal(aud.text, "It is 19 USD a month.");
+  const found = await aud.audit;
+  assert.equal(found.result, "differs");
+  assert.equal(found.statement, "The Starter plan costs 49 USD a month for up to 5 seats.");
+  assert.ok(s.events.some((e) => e.event === "audit" && e.detail.startsWith("differs")));
+  const good = await (await s.respond({ question: "How much is the Starter plan?", draft: "Starter is 49 USD a month for up to 5 seats.", mode: "audit" })).audit;
+  assert.equal(good.result, "supported");
+});
+
+test("the mode is read from Trooth; with Trooth unreachable from the start, Checked is used", async () => {
+  const net = site();
+  net.state.mode = "audit";
+  const s = new SemantoSource("acme.com", { fetch: net.fetch, now: () => NOW });
+  assert.deepEqual(await s.answerMode(), { mode: "audit", generated_sentences: false, source: "trooth" });
+  const down = site();
+  down.state.apiDown = true;
+  const t = new SemantoSource("acme.com", { fetch: async (u) => (u.endsWith("/trooth-keys.json") && u.startsWith("https://api.") ? net.fetch(u) : down.fetch(u)), now: () => NOW });
+  const m = await t.answerMode();
+  assert.deepEqual(m, { mode: "checked", generated_sentences: false, source: "fail_closed" });
+  assert.equal((await t.respond({ question: "How much is the Starter plan?", draft: "1 USD" })).mode, "checked");
+});
+
+test("auditDraft names what the record holds", () => {
+  const v = readJson("answer-v1/answers.json");
+  const marks = factMarks(v.file, v.stored_marks.changed, new Date(v.now));
+  const a = (q) => answer(v.file, v.company, { question: q }, marks);
+  assert.equal(auditDraft(a("What is the weather?"), "Sunny").result, "not_in_record");
+  assert.equal(auditDraft(a("What is your phone number?"), "x").result, "not_checked");
+  assert.equal(auditDraft(a("When were you founded?"), "Founded in 2012.").result, "supported");
 });

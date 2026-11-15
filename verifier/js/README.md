@@ -59,4 +59,11 @@ const r = await acme.reply({ question: userQuestion, draft: modelText });
 show(r.text); // r.statement is the signed sentence; r.discarded says a draft was dropped
 ```
 
-Trooth's API is used only for Trooth's witness keys and the monitor's marks. When it cannot be reached, answers keep coming from the last version that checked out and the source logs `trooth_api_unreachable`. A new version that does not check out is refused (`version_refused`) and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.
+`respond` follows the company's answer mode, chosen on trooth.co: **Checked** builds the reply by code (as `reply` does), **Source only** sends the model's draft unchecked, and **Audit** sends the draft and checks it right after (`r.audit` resolves to supported, differs with the signed sentence, marked, not in record or not checked). Until the mode can be read, Checked is used.
+
+```js
+const r = await acme.respond({ question: userQuestion, draft: modelText });
+show(r.text);
+```
+
+Trooth's API is used only for Trooth's witness keys, the monitor's marks and the answer mode. When it cannot be reached, answers keep coming from the last version that checked out and the source logs `trooth_api_unreachable`. A new version that does not check out is refused (`version_refused`) and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.
