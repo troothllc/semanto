@@ -25,6 +25,7 @@ See the [Semanto docs](https://trooth.co/docs/semanto) on trooth.co, with [insta
 | [`verifier/python`](verifier/python) | `trooth`: the Python verifier, `SemantoClient`, the `semanto-verify` command and LangChain, LlamaIndex and OpenAI Agents extras. | `pip install trooth` |
 | [`verifier/go`](verifier/go) | `github.com/troothllc/semanto/verifier/go`: the Go verifier and `cmd/semanto-verify`. Standard library only. | `go get github.com/troothllc/semanto/verifier/go` |
 | [`verifier/test-vectors/v1`](verifier/test-vectors/v1) | The vectors every verifier runs, positive and negative, each with what it must conclude. | |
+| [`verifier/test-vectors/answer-v1`](verifier/test-vectors/answer-v1) | The answer matcher and the answers Trooth's service gives with it; every library that answers in process must give the same ones. | |
 | [`deploy/cloudflare`](deploy/cloudflare) | The Cloudflare adapter: serves the signed copy on your own domain. | [Deploy to Cloudflare](https://deploy.workers.cloudflare.com/?url=https://github.com/troothllc/semanto/tree/main/deploy/cloudflare) |
 | [`action.yml`](action.yml) | Semanto on deploy: after a push, Semanto reads the site again and builds a new version, which waits for a person to sign it. | `uses: troothllc/semanto@v1` |
 

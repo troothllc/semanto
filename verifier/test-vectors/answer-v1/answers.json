@@ -1,0 +1,1477 @@
+{
+  "kind": "answers",
+  "description": "The answer matcher (fact ID, question map, key terms, word overlap) run by Trooth's service on this file, with these marks, at this time. Every library that answers in process must give the same answers.",
+  "now": "2026-11-15T12:00:00.000Z",
+  "company": {
+    "trooth_id": "acme",
+    "org": "Acme Inc",
+    "domain": "acme.com"
+  },
+  "check_base": "https://api.trooth.co/public/semanto",
+  "stored_marks": {
+    "version": 7,
+    "checked_at": "2026-11-14T00:00:00Z",
+    "changed": [
+      "smf_parity13"
+    ]
+  },
+  "file": {
+    "header": {
+      "version": 7,
+      "org": "Acme Inc",
+      "trooth_id": "acme",
+      "not_after": "2099-01-01T00:00:00Z"
+    },
+    "root_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "facts": [
+      {
+        "id": "smf_parity01",
+        "key": "identity.legal_name",
+        "statement": "The company's legal name is Acme Inc.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "Acme Inc",
+        "typed": {
+          "kind": "named",
+          "value": "Acme Inc"
+        }
+      },
+      {
+        "id": "smf_parity02",
+        "key": "identity.founding_date",
+        "statement": "Acme was founded in 2012.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "2012",
+        "typed": {
+          "kind": "date",
+          "value": "2012"
+        }
+      },
+      {
+        "id": "smf_parity03",
+        "key": "contact.phone",
+        "statement": "Call Acme sales at +1 312 555 0100.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "+13125550100",
+        "typed": {
+          "kind": "phone",
+          "value": "+13125550100"
+        },
+        "location": "Chicago"
+      },
+      {
+        "id": "smf_parity04",
+        "key": "contact.phone",
+        "statement": "Call Acme support at +1 415 555 0199.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "+14155550199",
+        "typed": {
+          "kind": "phone",
+          "value": "+14155550199"
+        },
+        "location": "San Francisco"
+      },
+      {
+        "id": "smf_parity05",
+        "key": "contact.email",
+        "statement": "Write to hello@acme.com.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "hello@acme.com"
+      },
+      {
+        "id": "smf_parity06",
+        "key": "contact.address",
+        "statement": "Acme's office is at 1 Main Street, Chicago, IL 60601.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "1 Main Street, Chicago, IL 60601"
+      },
+      {
+        "id": "smf_parity07",
+        "key": "hours.weekday",
+        "statement": "Acme is open 9 AM to 5 PM Central, Monday to Friday.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "09:00-17:00",
+        "conditions": [
+          "Monday to Friday"
+        ]
+      },
+      {
+        "id": "smf_parity08",
+        "key": "pricing.starter_monthly_usd",
+        "statement": "The Starter plan costs 49 USD a month for up to 5 seats.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": 49,
+        "typed": {
+          "kind": "amount",
+          "value": 49,
+          "currency": "USD"
+        },
+        "conditions": [
+          "up to 5 seats",
+          "per month"
+        ]
+      },
+      {
+        "id": "smf_parity09",
+        "key": "policy.refund_days",
+        "statement": "Acme refunds any plan within 30 days of purchase.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": 30
+      },
+      {
+        "id": "smf_parity10",
+        "key": "security.mfa",
+        "statement": "Every employee account uses multi-factor authentication.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": true
+      },
+      {
+        "id": "smf_parity11",
+        "key": "compliance.soc2_type2",
+        "statement": "Acme holds a SOC 2 Type II report covering security.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": true
+      },
+      {
+        "id": "smf_parity12",
+        "key": "offer.holiday_sale",
+        "statement": "The holiday sale takes 20 percent off the Pro plan.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": 20,
+        "valid_to": "2026-01-01"
+      },
+      {
+        "id": "smf_parity13",
+        "key": "product.integrations",
+        "statement": "Acme integrates with Slack, Jira and GitHub.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": [
+          "Slack",
+          "Jira",
+          "GitHub"
+        ]
+      },
+      {
+        "id": "smf_parity14",
+        "key": "product.data_residency",
+        "statement": "Customer data is stored in the United States.",
+        "provenance": "declared",
+        "evidence": {
+          "url": "https://acme.com/",
+          "witnessed_at": "2026-11-10T12:00:00.000Z",
+          "anchor": "p"
+        },
+        "valid_from": "2026-11-01",
+        "value": "US"
+      }
+    ],
+    "question_map": [
+      {
+        "question": "How do I reach a person?",
+        "fact_ids": [
+          "smf_parity05"
+        ]
+      }
+    ],
+    "witness": {
+      "at": "2026-11-12T00:00:00.000Z"
+    }
+  },
+  "cases": [
+    {
+      "input": {
+        "question": "What is your phone number?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "candidates",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity03",
+            "key": "contact.phone",
+            "statement": "Call Acme sales at +1 312 555 0100.",
+            "typed": {
+              "kind": "phone",
+              "value": "+13125550100"
+            },
+            "conditions": [],
+            "location": "Chicago",
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          },
+          {
+            "fact_id": "smf_parity04",
+            "key": "contact.phone",
+            "statement": "Call Acme support at +1 415 555 0199.",
+            "typed": {
+              "kind": "phone",
+              "value": "+14155550199"
+            },
+            "conditions": [],
+            "location": "San Francisco",
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "2 signed facts of Acme Inc could answer this; none is picked. Ask about one of them by its fact ID."
+      }
+    },
+    {
+      "input": {
+        "question": "How do I call you?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "candidates",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity03",
+            "key": "contact.phone",
+            "statement": "Call Acme sales at +1 312 555 0100.",
+            "typed": {
+              "kind": "phone",
+              "value": "+13125550100"
+            },
+            "conditions": [],
+            "location": "Chicago",
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          },
+          {
+            "fact_id": "smf_parity04",
+            "key": "contact.phone",
+            "statement": "Call Acme support at +1 415 555 0199.",
+            "typed": {
+              "kind": "phone",
+              "value": "+14155550199"
+            },
+            "conditions": [],
+            "location": "San Francisco",
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "2 signed facts of Acme Inc could answer this; none is picked. Ask about one of them by its fact ID."
+      }
+    },
+    {
+      "input": {
+        "question": "When were you founded?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity02",
+            "key": "identity.founding_date",
+            "statement": "Acme was founded in 2012.",
+            "typed": {
+              "kind": "date",
+              "value": "2012"
+            },
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Acme was founded in 2012.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "What's your legal name?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity01",
+            "key": "identity.legal_name",
+            "statement": "The company's legal name is Acme Inc.",
+            "typed": {
+              "kind": "named",
+              "value": "Acme Inc"
+            },
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "The company's legal name is Acme Inc.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "What is your email address?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity05",
+            "key": "contact.email",
+            "statement": "Write to hello@acme.com.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Write to hello@acme.com.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Where is your office?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity06",
+            "key": "contact.address",
+            "statement": "Acme's office is at 1 Main Street, Chicago, IL 60601.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Acme's office is at 1 Main Street, Chicago, IL 60601.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "What are your hours?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity07",
+            "key": "hours.weekday",
+            "statement": "Acme is open 9 AM to 5 PM Central, Monday to Friday.",
+            "typed": null,
+            "conditions": [
+              "Monday to Friday"
+            ],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Acme is open 9 AM to 5 PM Central, Monday to Friday.\nConditions: Monday to Friday.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "When do you open?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity07",
+            "key": "hours.weekday",
+            "statement": "Acme is open 9 AM to 5 PM Central, Monday to Friday.",
+            "typed": null,
+            "conditions": [
+              "Monday to Friday"
+            ],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Acme is open 9 AM to 5 PM Central, Monday to Friday.\nConditions: Monday to Friday.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "How much is the Starter plan?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "candidates",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity08",
+            "key": "pricing.starter_monthly_usd",
+            "statement": "The Starter plan costs 49 USD a month for up to 5 seats.",
+            "typed": {
+              "kind": "amount",
+              "value": 49,
+              "currency": "USD"
+            },
+            "conditions": [
+              "up to 5 seats",
+              "per month"
+            ],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          },
+          {
+            "fact_id": "smf_parity12",
+            "key": "offer.holiday_sale",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": "2026-01-01",
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "expired"
+          }
+        ],
+        "text": "2 signed facts of Acme Inc could answer this; none is picked. Ask about one of them by its fact ID."
+      }
+    },
+    {
+      "input": {
+        "question": "What does it cost?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "candidates",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity08",
+            "key": "pricing.starter_monthly_usd",
+            "statement": "The Starter plan costs 49 USD a month for up to 5 seats.",
+            "typed": {
+              "kind": "amount",
+              "value": 49,
+              "currency": "USD"
+            },
+            "conditions": [
+              "up to 5 seats",
+              "per month"
+            ],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          },
+          {
+            "fact_id": "smf_parity12",
+            "key": "offer.holiday_sale",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": "2026-01-01",
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "expired"
+          }
+        ],
+        "text": "2 signed facts of Acme Inc could answer this; none is picked. Ask about one of them by its fact ID."
+      }
+    },
+    {
+      "input": {
+        "question": "Do you offer refunds?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity09",
+            "key": "policy.refund_days",
+            "statement": "Acme refunds any plan within 30 days of purchase.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Acme refunds any plan within 30 days of purchase.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Do you use MFA?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity10",
+            "key": "security.mfa",
+            "statement": "Every employee account uses multi-factor authentication.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Every employee account uses multi-factor authentication.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Is 2FA required?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity10",
+            "key": "security.mfa",
+            "statement": "Every employee account uses multi-factor authentication.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Every employee account uses multi-factor authentication.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Are you SOC 2 compliant?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "Is there a holiday sale?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "What do you integrate with?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "Where is customer data stored?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "similarity",
+        "facts": [
+          {
+            "fact_id": "smf_parity14",
+            "key": "product.data_residency",
+            "statement": "Customer data is stored in the United States.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Customer data is stored in the United States.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "How do I reach a person?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "question_map",
+        "facts": [
+          {
+            "fact_id": "smf_parity05",
+            "key": "contact.email",
+            "statement": "Write to hello@acme.com.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Write to hello@acme.com.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "how do i reach a PERSON"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "question_map",
+        "facts": [
+          {
+            "fact_id": "smf_parity05",
+            "key": "contact.email",
+            "statement": "Write to hello@acme.com.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Write to hello@acme.com.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Do you support SAML single sign-on?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "What is the weather?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": ""
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "Starter plan seats"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "candidates",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity08",
+            "key": "pricing.starter_monthly_usd",
+            "statement": "The Starter plan costs 49 USD a month for up to 5 seats.",
+            "typed": {
+              "kind": "amount",
+              "value": 49,
+              "currency": "USD"
+            },
+            "conditions": [
+              "up to 5 seats",
+              "per month"
+            ],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          },
+          {
+            "fact_id": "smf_parity12",
+            "key": "offer.holiday_sale",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": "2026-01-01",
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "expired"
+          }
+        ],
+        "text": "2 signed facts of Acme Inc could answer this; none is picked. Ask about one of them by its fact ID."
+      }
+    },
+    {
+      "input": {
+        "question": "Acme integrates with Slack"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "similarity",
+        "facts": [
+          {
+            "fact_id": "smf_parity13",
+            "key": "product.integrations",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "changed_since_signing"
+          }
+        ],
+        "text": "Changed since signing: the page this came from no longer says it the same way. Check the page before quoting a value.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Which plan includes 5 seats per month?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "candidates",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity08",
+            "key": "pricing.starter_monthly_usd",
+            "statement": "The Starter plan costs 49 USD a month for up to 5 seats.",
+            "typed": {
+              "kind": "amount",
+              "value": 49,
+              "currency": "USD"
+            },
+            "conditions": [
+              "up to 5 seats",
+              "per month"
+            ],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          },
+          {
+            "fact_id": "smf_parity12",
+            "key": "offer.holiday_sale",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": "2026-01-01",
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "expired"
+          }
+        ],
+        "text": "2 signed facts of Acme Inc could answer this; none is picked. Ask about one of them by its fact ID."
+      }
+    },
+    {
+      "input": {
+        "question": "Is customer data encrypted at rest?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "Do you have a privacy policy?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "Can I get my money back?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity09",
+            "key": "policy.refund_days",
+            "statement": "Acme refunds any plan within 30 days of purchase.",
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "Acme refunds any plan within 30 days of purchase.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "question": "Do you ship internationally?"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    },
+    {
+      "input": {
+        "question": "registered company name"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "key_terms",
+        "facts": [
+          {
+            "fact_id": "smf_parity01",
+            "key": "identity.legal_name",
+            "statement": "The company's legal name is Acme Inc.",
+            "typed": {
+              "kind": "named",
+              "value": "Acme Inc"
+            },
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "The company's legal name is Acme Inc.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "fact_id": "smf_parity01"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "fact_id",
+        "facts": [
+          {
+            "fact_id": "smf_parity01",
+            "key": "identity.legal_name",
+            "statement": "The company's legal name is Acme Inc.",
+            "typed": {
+              "kind": "named",
+              "value": "Acme Inc"
+            },
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": null
+          }
+        ],
+        "text": "The company's legal name is Acme Inc.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "fact_id": "smf_parity12"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "fact_id",
+        "facts": [
+          {
+            "fact_id": "smf_parity12",
+            "key": "offer.holiday_sale",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": "2026-01-01",
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "expired"
+          }
+        ],
+        "text": "Expired: the company said this held only until a date that has passed.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "fact_id": "smf_parity13"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "answer",
+        "matched_by": "fact_id",
+        "facts": [
+          {
+            "fact_id": "smf_parity13",
+            "key": "product.integrations",
+            "statement": null,
+            "typed": null,
+            "conditions": [],
+            "location": null,
+            "valid_from": "2026-11-01",
+            "valid_to": null,
+            "provenance": "declared",
+            "source_url": "https://acme.com/",
+            "mark": "changed_since_signing"
+          }
+        ],
+        "text": "Changed since signing: the page this came from no longer says it the same way. Check the page before quoting a value.\nCheck: https://api.trooth.co/public/semanto/acme/versions/7"
+      }
+    },
+    {
+      "input": {
+        "fact_id": "smf_missing"
+      },
+      "expect": {
+        "object": "semanto.answer",
+        "matcher": "matcher-1-a75202e1",
+        "company": {
+          "trooth_id": "acme",
+          "name": "Acme Inc",
+          "domain": "acme.com"
+        },
+        "version": 7,
+        "version_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "signed_at": "2026-11-12T00:00:00.000Z",
+        "check": "https://api.trooth.co/public/semanto/acme/versions/7",
+        "status": "not_published",
+        "matched_by": null,
+        "facts": [],
+        "text": "Acme Inc's signed record does not answer this. Ask Acme Inc at acme.com."
+      }
+    }
+  ]
+}

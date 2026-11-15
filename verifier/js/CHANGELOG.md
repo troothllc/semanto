@@ -5,6 +5,11 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 1.2.0 (2026-11-15)
+
+- `SemantoSource` (`@trooth/semanto-verify/source`): loads a company's signed copy from its own site (`/.well-known/trooth.semanto` and its keys), checks it once for each new body, reads it again at most every 15 minutes, and answers fact IDs and plain questions in process. When Trooth's API cannot be reached it keeps answering from the last version that checked out and logs a `trooth_api_unreachable` event; a new version that does not check out is refused and logged, and the last good one stays in use.
+- `answer()` (`@trooth/semanto-verify/answer`): the answer matcher Trooth's service runs (`matcher-1-a75202e1`), with the same answers to every case in `test-vectors/answer-v1`. A fact marked changed since signing or expired returns its mark and no value.
+
 ## 1.1.1 (2026-11-15)
 
 - The first release built and published from this repository's workflow, with npm provenance and a keyless signature. The code is the same as 1.1.0.

@@ -45,7 +45,7 @@ Canonical JSON here supports integers exactly. A non-integer float raises `Canon
 
 ## Tests
 
-`python3 -m pytest` runs every shared vector in `verifier/test-vectors/v1` (positive and negative), the RFC 6962 known roots, the RFC 8785 cases, the state rules and the command line.
+`python3 -m pytest` runs every shared vector in `verifier/test-vectors/v1` (positive and negative), the answer cases in `verifier/test-vectors/answer-v1`, the source's refresh and offline behavior, the RFC 6962 known roots, the RFC 8785 cases, the state rules and the command line.
 
 ## SemantoClient
 
@@ -56,3 +56,14 @@ print(r["ok"], r["dns"], r["reason"])
 ```
 
 It fetches with the standard library (pass `fetch=` to use your own), checks the response signature and the domain's `_trooth-keys` TXT record over DNS over HTTPS, and keeps key sets and DNS answers five minutes.
+
+## SemantoSource
+
+```python
+from trooth import SemantoSource
+acme = SemantoSource("acme.com", on_event=lambda e: print(e["event"], e["detail"]))
+a = acme.answer(question="How much is the Starter plan?")
+print(a["status"], a["text"])
+```
+
+It loads `/.well-known/trooth.semanto` and the company's keys from the company's site, checks the file once for each new body, reads the site again at most every 15 minutes, and answers fact IDs and plain questions in process with the same matcher as Trooth's service (`trooth_semanto_verify.answer`, compared case by case with `verifier/test-vectors/answer-v1`). When Trooth's API cannot be reached it keeps answering from the last version that checked out and logs `trooth_api_unreachable`; a new version that does not check out is refused and the last good one stays in use. A fact marked changed since signing or expired returns its mark and no value.
