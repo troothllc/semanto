@@ -52,13 +52,13 @@ jobs:
         run: mkdir -p ../../release && npm pack --pack-destination ../../release
       - name: Publish with provenance
         run: npm stage publish ../../release/trooth-semanto-verify-*.tgz --provenance --access public
-      - uses: sigstore/cosign-installer@v3
+      - uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
       - name: Checksums and a keyless signature for each release file
         working-directory: release
         run: |
           sha256sum trooth-semanto-verify-*.tgz > SHA256SUMS
           for f in trooth-semanto-verify-*.tgz SHA256SUMS; do cosign sign-blob --yes --bundle "$f.sigstore.json" "$f"; done
-      - uses: actions/attest-build-provenance@v4
+      - uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
         with:
           subject-path: release/trooth-semanto-verify-*.tgz
       - name: The GitHub release for this tag
