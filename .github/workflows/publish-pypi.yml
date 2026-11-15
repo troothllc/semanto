@@ -43,8 +43,8 @@ jobs:
           test "$want" = "$have" || { echo "tag $TAG does not match version $have in pyproject.toml"; exit 1; }
       - name: Test, the base package and every extra
         run: |
-          python3 -m pip install --upgrade pip build twine pytest
-          python3 -m pip install ".[langchain,llama-index,openai-agents]"
+          python3 -m pip install --require-hashes -r requirements-ci.txt
+          python3 -m pip install --no-deps .
           python3 -m pytest -q -p no:cacheprovider test_integrations.py test_client.py test_vectors.py test_source.py
       - name: Build the wheel and sdist
         run: |

@@ -1,0 +1,7 @@
+{
+  "name": "semanto-release-npm",
+  "private": true,
+  "description": "The npm CLI the release workflow publishes with, locked so it installs with npm ci. Staged publishing needs npm 11.15.0 or later.",
+  "license": "Apache-2.0",
+  "dependencies": { "npm": "11.21.2" }
+}

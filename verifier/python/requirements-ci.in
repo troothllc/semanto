@@ -1,0 +1,5 @@
+# The tools CI and the release use, beside the package and its extras. Locked with hashes in requirements-ci.txt:
+#   uv pip compile requirements-ci.in pyproject.toml --extra langchain --extra llama-index --extra openai-agents --universal --python-version 3.11 --generate-hashes -o requirements-ci.txt
+pytest
+build
+twine
