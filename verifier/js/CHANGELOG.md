@@ -5,6 +5,10 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 1.5.1 (2026-11-15)
+
+- Email addresses are found in one pass and trailing question marks are trimmed without a regular expression, so a hostile question of any length is read in linear time (found by CodeQL). Every result is the same.
+
 ## 1.5.0 (2026-11-15)
 
 - What the customer sees. `SemantoSource.reply` now returns the reply built by `customerReply` (`@trooth/semanto-verify/turn`): a value answer is at most three lines, the signed sentence, its conditions, and "From <Company>'s signed record. Signed <date>. Check it: <link>" (`markdown` carries the link as a link), never more than 600 characters, and no library line speaks to the reader. The structured result carries the value, conditions, contact route and choices.
