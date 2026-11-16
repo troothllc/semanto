@@ -1,0 +1,3779 @@
+{
+ "about": "Locked values and languages: outgoing sentences with a locked value the company did not sign are removed; values rendered by code per language. The JavaScript and Python kits give these results.",
+ "file": {
+  "facts": [
+   {
+    "id": "f1",
+    "key": "commercial.plan.pro.price",
+    "statement": "The Pro plan costs $49 per month.",
+    "typed": {
+     "type": "amount",
+     "value": "49.00",
+     "currency": "USD"
+    }
+   },
+   {
+    "id": "f2",
+    "key": "contact.phone",
+    "statement": "Call Acme at +1 555 010 0100.",
+    "typed": {
+     "type": "phone",
+     "value": "+15550100100"
+    }
+   },
+   {
+    "id": "f3",
+    "key": "commercial.refund_days",
+    "statement": "Acme refunds any plan within 30 days.",
+    "typed": {
+     "type": "duration",
+     "value": "P30D"
+    }
+   }
+  ]
+ },
+ "code_answer": "The Pro plan costs $49 per month.",
+ "drafts": [
+  {
+   "draft": "Pro costs $45 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $45 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "45 USD",
+        "raw": "$45"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 45 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 45 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "45 USD",
+        "raw": "45 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 45 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 45 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "45 USD",
+        "raw": "45 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $39 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $39 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "39 USD",
+        "raw": "$39"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 39 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 39 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "39 USD",
+        "raw": "39 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 39 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 39 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "39 USD",
+        "raw": "39 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $59 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $59 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "59 USD",
+        "raw": "$59"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 59 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 59 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "59 USD",
+        "raw": "59 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 59 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 59 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "59 USD",
+        "raw": "59 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $52.99 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $52.99 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "52.99 USD",
+        "raw": "$52.99"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 52.99 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 52.99 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "52.99 USD",
+        "raw": "52.99 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 52.99 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 52.99 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "52.99 USD",
+        "raw": "52.99 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $48 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $48 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "48 USD",
+        "raw": "$48"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 48 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 48 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "48 USD",
+        "raw": "48 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 48 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 48 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "48 USD",
+        "raw": "48 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $50 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $50 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "50 USD",
+        "raw": "$50"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 50 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 50 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "50 USD",
+        "raw": "50 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 50 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 50 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "50 USD",
+        "raw": "50 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $47.5 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $47.5 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "47.5 USD",
+        "raw": "$47.5"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 47.5 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 47.5 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "47.5 USD",
+        "raw": "47.5 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 47.5 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 47.5 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "47.5 USD",
+        "raw": "47.5 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $99 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $99 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "99 USD",
+        "raw": "$99"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 99 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 99 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "99 USD",
+        "raw": "99 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 99 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 99 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "99 USD",
+        "raw": "99 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $29 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $29 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "29 USD",
+        "raw": "$29"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 29 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 29 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "29 USD",
+        "raw": "29 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 29 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 29 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "29 USD",
+        "raw": "29 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $19 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $19 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "19 USD",
+        "raw": "$19"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "The Pro plan is 19 USD per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "The Pro plan is 19 USD per month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "19 USD",
+        "raw": "19 USD"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "You will pay 19 dollars for Pro.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "You will pay 19 dollars for Pro.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "19 USD",
+        "raw": "19 dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs forty-five dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs forty-five dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "45 USD",
+        "raw": "forty-five dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs thirty-nine dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs thirty-nine dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "39 USD",
+        "raw": "thirty-nine dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs fifty-nine dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs fifty-nine dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "59 USD",
+        "raw": "fifty-nine dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs fifty dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs fifty dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "50 USD",
+        "raw": "fifty dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs forty-eight dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs forty-eight dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "48 USD",
+        "raw": "forty-eight dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs ninety-nine dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs ninety-nine dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "99 USD",
+        "raw": "ninety-nine dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs twenty-nine dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs twenty-nine dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "29 USD",
+        "raw": "twenty-nine dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs nineteen dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs nineteen dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "19 USD",
+        "raw": "nineteen dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs forty-nine dollars and ninety-nine cents a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs forty-nine dollars and ninety-nine cents a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "49.99 USD",
+        "raw": "forty-nine dollars and ninety-nine cents"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs one hundred dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs one hundred dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "100 USD",
+        "raw": "one hundred dollars"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $40-60 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $40-60 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "40 USD",
+        "raw": "$40"
+       },
+       {
+        "kind": "number",
+        "norm": "60",
+        "raw": "60"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $39 to $59 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $39 to $59 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "39 USD",
+        "raw": "$39"
+       },
+       {
+        "kind": "money",
+        "norm": "59 USD",
+        "raw": "$59"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs between $30 and $49 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs between $30 and $49 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "30 USD",
+        "raw": "$30"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs from 39 to 59 dollars a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs from 39 to 59 dollars a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "59 USD",
+        "raw": "59 dollars"
+       },
+       {
+        "kind": "number",
+        "norm": "39",
+        "raw": "39"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $45 to $55 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $45 to $55 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "45 USD",
+        "raw": "$45"
+       },
+       {
+        "kind": "money",
+        "norm": "55 USD",
+        "raw": "$55"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs 40 to 50 USD a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs 40 to 50 USD a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "50 USD",
+        "raw": "50 USD"
+       },
+       {
+        "kind": "number",
+        "norm": "40",
+        "raw": "40"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $49-$69 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $49-$69 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "69 USD",
+        "raw": "$69"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs between $10 and $20 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs between $10 and $20 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "10 USD",
+        "raw": "$10"
+       },
+       {
+        "kind": "money",
+        "norm": "20 USD",
+        "raw": "$20"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $25 to $35 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $25 to $35 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "25 USD",
+        "raw": "$25"
+       },
+       {
+        "kind": "money",
+        "norm": "35 USD",
+        "raw": "$35"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  },
+  {
+   "draft": "Pro costs $45 or $49 a month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [
+     {
+      "sentence": "Pro costs $45 or $49 a month.",
+      "values": [
+       {
+        "kind": "money",
+        "norm": "45 USD",
+        "raw": "$45"
+       }
+      ]
+     }
+    ],
+    "ok": false
+   }
+  }
+ ],
+ "kept": [
+  {
+   "draft": "The Pro plan costs $49 per month.",
+   "out": {
+    "text": "The Pro plan costs $49 per month.",
+    "removed": [],
+    "ok": true
+   }
+  },
+  {
+   "draft": "Pro costs forty-nine dollars a month.",
+   "out": {
+    "text": "Pro costs forty-nine dollars a month.",
+    "removed": [],
+    "ok": true
+   }
+  },
+  {
+   "draft": "Pro is popular with small teams.",
+   "out": {
+    "text": "Pro is popular with small teams.",
+    "removed": [],
+    "ok": true
+   }
+  },
+  {
+   "draft": "Refunds are possible within 30 days.",
+   "out": {
+    "text": "Refunds are possible within 30 days.",
+    "removed": [],
+    "ok": true
+   }
+  }
+ ],
+ "replies": [
+  {
+   "lang": "en",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "reply": {
+    "text": "$49.00\n\"Signed sentence 1.\"",
+    "value": "49.00",
+    "rendered": "$49.00",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "reply": {
+    "text": "€1,299.50\n\"Signed sentence 2.\"",
+    "value": "1299.50",
+    "rendered": "€1,299.50",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "reply": {
+    "text": "£12.00\n\"Signed sentence 3.\"",
+    "value": "12.00",
+    "rendered": "£12.00",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "reply": {
+    "text": "¥4,900\n\"Signed sentence 4.\"",
+    "value": "4900",
+    "rendered": "¥4,900",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "reply": {
+    "text": "$0.99\n\"Signed sentence 5.\"",
+    "value": "0.99",
+    "rendered": "$0.99",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "reply": {
+    "text": "June 30, 2026\n\"Signed sentence 6.\"",
+    "value": "2026-06-30",
+    "rendered": "June 30, 2026",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "reply": {
+    "text": "January 15, 2019\n\"Signed sentence 7.\"",
+    "value": "2019-01-15",
+    "rendered": "January 15, 2019",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "reply": {
+    "text": "December 1, 2026\n\"Signed sentence 8.\"",
+    "value": "2026-12-01",
+    "rendered": "December 1, 2026",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "reply": {
+    "text": "February 29, 2024\n\"Signed sentence 9.\"",
+    "value": "2024-02-29",
+    "rendered": "February 29, 2024",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "reply": {
+    "text": "October 9, 2025\n\"Signed sentence 10.\"",
+    "value": "2025-10-09",
+    "rendered": "October 9, 2025",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "reply": {
+    "text": "99.9%\n\"Signed sentence 11.\"",
+    "value": "99.9",
+    "rendered": "99.9%",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "reply": {
+    "text": "20%\n\"Signed sentence 12.\"",
+    "value": "20",
+    "rendered": "20%",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "reply": {
+    "text": "7.5%\n\"Signed sentence 13.\"",
+    "value": "7.5",
+    "rendered": "7.5%",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "reply": {
+    "text": "100%\n\"Signed sentence 14.\"",
+    "value": "100",
+    "rendered": "100%",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "reply": {
+    "text": "0.5%\n\"Signed sentence 15.\"",
+    "value": "0.5",
+    "rendered": "0.5%",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "reply": {
+    "text": "1,200\n\"Signed sentence 16.\"",
+    "value": "1200",
+    "rendered": "1,200",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "reply": {
+    "text": "35\n\"Signed sentence 17.\"",
+    "value": "35",
+    "rendered": "35",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "reply": {
+    "text": "1,000,000\n\"Signed sentence 18.\"",
+    "value": "1000000",
+    "rendered": "1,000,000",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "reply": {
+    "text": "+15550100100\n\"Signed sentence 19.\"",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "en",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "reply": {
+    "text": "P30D\n\"Signed sentence 20.\"",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "en",
+    "translation": false
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(es) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "49,00 $\nTraducción: (es) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "49,00 $",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(es) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.299,50 €\nTraducción: (es) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "1.299,50 €",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(es) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "12,00 £\nTraducción: (es) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "12,00 £",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(es) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "4.900 ¥\nTraducción: (es) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "4.900 ¥",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(es) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,99 $\nTraducción: (es) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "0,99 $",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(es) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "30 de junio de 2026\nTraducción: (es) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "30 de junio de 2026",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(es) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "15 de enero de 2019\nTraducción: (es) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "15 de enero de 2019",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(es) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 de diciembre de 2026\nTraducción: (es) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "1 de diciembre de 2026",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(es) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "29 de febrero de 2024\nTraducción: (es) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "29 de febrero de 2024",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(es) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "9 de octubre de 2025\nTraducción: (es) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "9 de octubre de 2025",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(es) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99,9%\nTraducción: (es) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99,9%",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(es) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20%\nTraducción: (es) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20%",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(es) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7,5%\nTraducción: (es) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7,5%",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(es) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100%\nTraducción: (es) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100%",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(es) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,5%\nTraducción: (es) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0,5%",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(es) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.200\nTraducción: (es) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1.200",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(es) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\nTraducción: (es) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(es) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.000.000\nTraducción: (es) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1.000.000",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(es) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\nTraducción: (es) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "es",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(es) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\nTraducción: (es) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "es",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(fr) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "49,00 $\nTraduction: (fr) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "49,00 $",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(fr) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 299,50 €\nTraduction: (fr) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "1 299,50 €",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(fr) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "12,00 £\nTraduction: (fr) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "12,00 £",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(fr) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "4 900 ¥\nTraduction: (fr) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "4 900 ¥",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(fr) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,99 $\nTraduction: (fr) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "0,99 $",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(fr) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "30 juin 2026\nTraduction: (fr) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "30 juin 2026",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(fr) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "15 janvier 2019\nTraduction: (fr) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "15 janvier 2019",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(fr) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 décembre 2026\nTraduction: (fr) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "1 décembre 2026",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(fr) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "29 février 2024\nTraduction: (fr) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "29 février 2024",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(fr) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "9 octobre 2025\nTraduction: (fr) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "9 octobre 2025",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(fr) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99,9 %\nTraduction: (fr) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99,9 %",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(fr) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20 %\nTraduction: (fr) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20 %",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(fr) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7,5 %\nTraduction: (fr) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7,5 %",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(fr) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100 %\nTraduction: (fr) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100 %",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(fr) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,5 %\nTraduction: (fr) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0,5 %",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(fr) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 200\nTraduction: (fr) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1 200",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(fr) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\nTraduction: (fr) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(fr) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 000 000\nTraduction: (fr) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1 000 000",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(fr) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\nTraduction: (fr) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "fr",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(fr) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\nTraduction: (fr) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "fr",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(de) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "49,00 $\nÜbersetzung: (de) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "49,00 $",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(de) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.299,50 €\nÜbersetzung: (de) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "1.299,50 €",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(de) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "12,00 £\nÜbersetzung: (de) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "12,00 £",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(de) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "4.900 ¥\nÜbersetzung: (de) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "4.900 ¥",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(de) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,99 $\nÜbersetzung: (de) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "0,99 $",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(de) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "30. Juni 2026\nÜbersetzung: (de) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "30. Juni 2026",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(de) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "15. Januar 2019\nÜbersetzung: (de) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "15. Januar 2019",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(de) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1. Dezember 2026\nÜbersetzung: (de) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "1. Dezember 2026",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(de) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "29. Februar 2024\nÜbersetzung: (de) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "29. Februar 2024",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(de) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "9. Oktober 2025\nÜbersetzung: (de) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "9. Oktober 2025",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(de) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99,9 %\nÜbersetzung: (de) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99,9 %",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(de) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20 %\nÜbersetzung: (de) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20 %",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(de) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7,5 %\nÜbersetzung: (de) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7,5 %",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(de) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100 %\nÜbersetzung: (de) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100 %",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(de) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,5 %\nÜbersetzung: (de) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0,5 %",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(de) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.200\nÜbersetzung: (de) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1.200",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(de) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\nÜbersetzung: (de) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(de) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.000.000\nÜbersetzung: (de) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1.000.000",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(de) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\nÜbersetzung: (de) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "de",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(de) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\nÜbersetzung: (de) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "de",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(pt) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "$ 49,00\nTradução: (pt) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "$ 49,00",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(pt) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "€ 1.299,50\nTradução: (pt) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "€ 1.299,50",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(pt) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "£ 12,00\nTradução: (pt) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "£ 12,00",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(pt) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "¥ 4.900\nTradução: (pt) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "¥ 4.900",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(pt) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "$ 0,99\nTradução: (pt) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "$ 0,99",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(pt) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "30 de junho de 2026\nTradução: (pt) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "30 de junho de 2026",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(pt) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "15 de janeiro de 2019\nTradução: (pt) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "15 de janeiro de 2019",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(pt) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 de dezembro de 2026\nTradução: (pt) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "1 de dezembro de 2026",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(pt) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "29 de fevereiro de 2024\nTradução: (pt) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "29 de fevereiro de 2024",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(pt) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "9 de outubro de 2025\nTradução: (pt) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "9 de outubro de 2025",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(pt) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99,9%\nTradução: (pt) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99,9%",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(pt) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20%\nTradução: (pt) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20%",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(pt) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7,5%\nTradução: (pt) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7,5%",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(pt) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100%\nTradução: (pt) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100%",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(pt) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,5%\nTradução: (pt) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0,5%",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(pt) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.200\nTradução: (pt) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1.200",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(pt) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\nTradução: (pt) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(pt) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.000.000\nTradução: (pt) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1.000.000",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(pt) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\nTradução: (pt) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "pt",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(pt) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\nTradução: (pt) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "pt",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(it) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "49,00 $\nTraduzione: (it) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "49,00 $",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(it) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.299,50 €\nTraduzione: (it) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "1.299,50 €",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(it) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "12,00 £\nTraduzione: (it) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "12,00 £",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(it) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "4.900 ¥\nTraduzione: (it) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "4.900 ¥",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(it) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,99 $\nTraduzione: (it) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "0,99 $",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(it) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "30 giugno 2026\nTraduzione: (it) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "30 giugno 2026",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(it) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "15 gennaio 2019\nTraduzione: (it) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "15 gennaio 2019",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(it) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1 dicembre 2026\nTraduzione: (it) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "1 dicembre 2026",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(it) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "29 febbraio 2024\nTraduzione: (it) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "29 febbraio 2024",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(it) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "9 ottobre 2025\nTraduzione: (it) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "9 ottobre 2025",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(it) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99,9%\nTraduzione: (it) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99,9%",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(it) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20%\nTraduzione: (it) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20%",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(it) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7,5%\nTraduzione: (it) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7,5%",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(it) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100%\nTraduzione: (it) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100%",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(it) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0,5%\nTraduzione: (it) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0,5%",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(it) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.200\nTraduzione: (it) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1.200",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(it) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\nTraduzione: (it) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(it) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1.000.000\nTraduzione: (it) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1.000.000",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(it) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\nTraduzione: (it) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "it",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(it) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\nTraduzione: (it) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "it",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(ja) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "$49.00\n翻訳: (ja) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "$49.00",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(ja) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "€1,299.50\n翻訳: (ja) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "€1,299.50",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(ja) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "£12.00\n翻訳: (ja) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "£12.00",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(ja) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "¥4,900\n翻訳: (ja) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "¥4,900",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(ja) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "$0.99\n翻訳: (ja) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "$0.99",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(ja) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2026年6月30日\n翻訳: (ja) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "2026年6月30日",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(ja) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2019年1月15日\n翻訳: (ja) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "2019年1月15日",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(ja) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2026年12月1日\n翻訳: (ja) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "2026年12月1日",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(ja) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2024年2月29日\n翻訳: (ja) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "2024年2月29日",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(ja) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2025年10月9日\n翻訳: (ja) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "2025年10月9日",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(ja) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99.9%\n翻訳: (ja) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99.9%",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(ja) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20%\n翻訳: (ja) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20%",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(ja) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7.5%\n翻訳: (ja) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7.5%",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(ja) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100%\n翻訳: (ja) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100%",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(ja) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0.5%\n翻訳: (ja) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0.5%",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(ja) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1,200\n翻訳: (ja) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1,200",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(ja) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\n翻訳: (ja) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(ja) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1,000,000\n翻訳: (ja) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1,000,000",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(ja) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\n翻訳: (ja) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "ja",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(ja) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\n翻訳: (ja) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "ja",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "amount",
+    "value": "49.00",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 1.",
+   "translated": "(zh) 1",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "$49.00\n翻译: (zh) 1 (Signed sentence 1. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "49.00",
+    "rendered": "$49.00",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "amount",
+    "value": "1299.50",
+    "currency": "EUR"
+   },
+   "statement": "Signed sentence 2.",
+   "translated": "(zh) 2",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "€1,299.50\n翻译: (zh) 2 (Signed sentence 2. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1299.50",
+    "rendered": "€1,299.50",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "amount",
+    "value": "12.00",
+    "currency": "GBP"
+   },
+   "statement": "Signed sentence 3.",
+   "translated": "(zh) 3",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "£12.00\n翻译: (zh) 3 (Signed sentence 3. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "12.00",
+    "rendered": "£12.00",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "amount",
+    "value": "4900",
+    "currency": "JPY"
+   },
+   "statement": "Signed sentence 4.",
+   "translated": "(zh) 4",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "¥4,900\n翻译: (zh) 4 (Signed sentence 4. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "4900",
+    "rendered": "¥4,900",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "amount",
+    "value": "0.99",
+    "currency": "USD"
+   },
+   "statement": "Signed sentence 5.",
+   "translated": "(zh) 5",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "$0.99\n翻译: (zh) 5 (Signed sentence 5. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.99",
+    "rendered": "$0.99",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "date",
+    "value": "2026-06-30"
+   },
+   "statement": "Signed sentence 6.",
+   "translated": "(zh) 6",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2026年6月30日\n翻译: (zh) 6 (Signed sentence 6. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-06-30",
+    "rendered": "2026年6月30日",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "date",
+    "value": "2019-01-15"
+   },
+   "statement": "Signed sentence 7.",
+   "translated": "(zh) 7",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2019年1月15日\n翻译: (zh) 7 (Signed sentence 7. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2019-01-15",
+    "rendered": "2019年1月15日",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "date",
+    "value": "2026-12-01"
+   },
+   "statement": "Signed sentence 8.",
+   "translated": "(zh) 8",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2026年12月1日\n翻译: (zh) 8 (Signed sentence 8. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2026-12-01",
+    "rendered": "2026年12月1日",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "date",
+    "value": "2024-02-29"
+   },
+   "statement": "Signed sentence 9.",
+   "translated": "(zh) 9",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2024年2月29日\n翻译: (zh) 9 (Signed sentence 9. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2024-02-29",
+    "rendered": "2024年2月29日",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "date",
+    "value": "2025-10-09"
+   },
+   "statement": "Signed sentence 10.",
+   "translated": "(zh) 10",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "2025年10月9日\n翻译: (zh) 10 (Signed sentence 10. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "2025-10-09",
+    "rendered": "2025年10月9日",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "percent",
+    "value": "99.9"
+   },
+   "statement": "Signed sentence 11.",
+   "translated": "(zh) 11",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "99.9%\n翻译: (zh) 11 (Signed sentence 11. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "99.9",
+    "rendered": "99.9%",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "percent",
+    "value": "20"
+   },
+   "statement": "Signed sentence 12.",
+   "translated": "(zh) 12",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "20%\n翻译: (zh) 12 (Signed sentence 12. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "20",
+    "rendered": "20%",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "percent",
+    "value": "7.5"
+   },
+   "statement": "Signed sentence 13.",
+   "translated": "(zh) 13",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "7.5%\n翻译: (zh) 13 (Signed sentence 13. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "7.5",
+    "rendered": "7.5%",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "percent",
+    "value": "100"
+   },
+   "statement": "Signed sentence 14.",
+   "translated": "(zh) 14",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "100%\n翻译: (zh) 14 (Signed sentence 14. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "100",
+    "rendered": "100%",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "percent",
+    "value": "0.5"
+   },
+   "statement": "Signed sentence 15.",
+   "translated": "(zh) 15",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "0.5%\n翻译: (zh) 15 (Signed sentence 15. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "0.5",
+    "rendered": "0.5%",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "number",
+    "value": "1200"
+   },
+   "statement": "Signed sentence 16.",
+   "translated": "(zh) 16",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1,200\n翻译: (zh) 16 (Signed sentence 16. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1200",
+    "rendered": "1,200",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "number",
+    "value": "35"
+   },
+   "statement": "Signed sentence 17.",
+   "translated": "(zh) 17",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "35\n翻译: (zh) 17 (Signed sentence 17. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "35",
+    "rendered": "35",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "number",
+    "value": "1000000"
+   },
+   "statement": "Signed sentence 18.",
+   "translated": "(zh) 18",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "1,000,000\n翻译: (zh) 18 (Signed sentence 18. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "1000000",
+    "rendered": "1,000,000",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "phone",
+    "value": "+15550100100"
+   },
+   "statement": "Signed sentence 19.",
+   "translated": "(zh) 19",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "+15550100100\n翻译: (zh) 19 (Signed sentence 19. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "+15550100100",
+    "rendered": "+15550100100",
+    "lang": "zh",
+    "translation": true
+   }
+  },
+  {
+   "lang": "zh",
+   "typed": {
+    "type": "duration",
+    "value": "P30D"
+   },
+   "statement": "Signed sentence 20.",
+   "translated": "(zh) 20",
+   "check": "https://api.trooth.co/public/semanto/acme/versions/3",
+   "reply": {
+    "text": "P30D\n翻译: (zh) 20 (Signed sentence 20. https://api.trooth.co/public/semanto/acme/versions/3)",
+    "value": "P30D",
+    "rendered": "P30D",
+    "lang": "zh",
+    "translation": true
+   }
+  }
+ ]
+}

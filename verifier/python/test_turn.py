@@ -368,3 +368,40 @@ def test_openai_agents_guardrail():
 def test_page_hashes_match_the_manifest():
     for p in VEC["file"]["header"]["pages_manifest"]:
         assert "sha256:" + hashlib.sha256(PAGES["by_id"][p["id"]].encode()).hexdigest() == p["hash"]
+
+
+# ------------------------------------------------------------------ locked values and languages
+
+def _locked():
+    return json.loads((Path(__file__).resolve().parent.parent / "test-vectors" / "locked-v1" / "vectors.json").read_text(encoding="utf-8"))
+
+
+def test_locked_fifty_seeded_drafts_are_removed_as_the_javascript_kit_removes_them():
+    from trooth_semanto_verify.turn import guard_outgoing
+    v = _locked()
+    assert len(v["drafts"]) == 50
+    for d in v["drafts"]:
+        got = guard_outgoing(d["draft"], v["file"], code_answer=v["code_answer"])
+        assert got == d["out"], d["draft"]
+        assert got["ok"] is False and got["text"] == v["code_answer"]
+    for k in v["kept"]:
+        assert guard_outgoing(k["draft"], v["file"], code_answer=v["code_answer"])["ok"] is True, k["draft"]
+
+
+def test_locked_a_company_added_locked_type():
+    from trooth_semanto_verify.turn import guard_outgoing
+    v = _locked()
+    types = [{"kind": "sku", "pattern": re.compile(r"\bSKU-\d+\b", re.I)}]
+    assert guard_outgoing("Order SKU-12 today.", v["file"], locked_types=types)["ok"] is False
+    f = {"facts": [*v["file"]["facts"], {"id": "f9", "key": "product.x", "statement": "Order SKU-12 today."}]}
+    assert guard_outgoing("Ask for SKU-12 at the desk.", f, locked_types=types)["ok"] is True
+
+
+def test_languages_values_rendered_by_code_in_each_language_as_the_javascript_kit_renders_them():
+    from trooth_semanto_verify.turn import LOCALES, value_reply
+    v = _locked()
+    assert len(v["replies"]) == 20 * len(LOCALES)
+    for r in v["replies"]:
+        got = value_reply({"statement": r["statement"], "typed": r["typed"]}, r["lang"], translated=r.get("translated"), check=r.get("check"))
+        assert got == r["reply"], (r["lang"], r["typed"])
+        assert got["value"] == r["typed"]["value"]

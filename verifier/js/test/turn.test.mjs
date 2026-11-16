@@ -437,3 +437,38 @@ test("the HTTPS handler refuses anything but a JSON POST", async () => {
   const ok = await (await h(new Request("https://bot.acme.com/", { method: "POST", body: JSON.stringify({ fact_id: "smf_parity02" }) }))).json();
   assert.equal(ok.statement, "Acme was founded in 2012.");
 });
+
+// ------------------------------------------------------------------ locked values and languages
+
+const L = readJson("locked-v1/vectors.json");
+
+test("Locked values: fifty seeded drafts with a wrong price in digits, in words and inside a range are each removed, the code answer in their place", async () => {
+  const { guardOutgoing } = await import("../turn.mjs");
+  assert.equal(L.drafts.length, 50);
+  for (const d of L.drafts) {
+    const got = guardOutgoing(d.draft, L.file, { codeAnswer: L.code_answer });
+    assert.deepEqual(got, d.out, d.draft);
+    assert.equal(got.ok, false, d.draft);
+    assert.equal(got.text, L.code_answer, d.draft);
+  }
+  for (const k of L.kept) assert.equal(guardOutgoing(k.draft, L.file, { codeAnswer: L.code_answer }).ok, true, k.draft);
+});
+
+test("Locked values: a company adds a locked type; a value of it the record does not hold is removed", async () => {
+  const { guardOutgoing } = await import("../turn.mjs");
+  const lockedTypes = [{ kind: "sku", pattern: /\bSKU-\d+\b/i }];
+  assert.equal(guardOutgoing("Order SKU-12 today.", L.file, { lockedTypes }).ok, false);
+  const file = { facts: [...L.file.facts, { id: "f9", key: "product.x", statement: "Order SKU-12 today." }] };
+  assert.equal(guardOutgoing("Ask for SKU-12 at the desk.", file, { lockedTypes }).ok, true);
+});
+
+test("Languages: twenty value questions in each language show the exact signed value, rendered by code; other languages are marked as translations", async () => {
+  const { valueReply, LOCALES } = await import("../turn.mjs");
+  assert.equal(L.replies.length, 20 * Object.keys(LOCALES).length);
+  for (const r of L.replies) {
+    const got = valueReply({ statement: r.statement, typed: r.typed }, r.lang, r.translated ? { translated: r.translated, check: r.check } : {});
+    assert.deepEqual(got, r.reply);
+    assert.equal(got.value, r.typed.value);
+    if (r.lang !== "en") assert.match(got.text, new RegExp(`^${got.rendered.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\n${LOCALES[r.lang].translation}: `));
+  }
+});

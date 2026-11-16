@@ -470,3 +470,173 @@ export function maskPersonal(text, file) {
 }
 
 const COMMON_START = new Set(["the", "our", "we", "this", "that", "every", "each", "all", "it", "in", "on", "at", "for", "from", "with", "customer", "customers", "starter", "pro", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]);
+
+// ------------------------------------------------------------------ locked values never come from a model
+
+const ONES = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19 };
+const TENS = { twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
+const SCALES = { hundred: 100, thousand: 1000, million: 1000000 };
+const NUMWORD = [...Object.keys(ONES), ...Object.keys(TENS), ...Object.keys(SCALES), "a", "and"].join("|");
+const MONEY_WORDS = new RegExp(String.raw`\b((?:(?:${NUMWORD})(?:[\s-]+|(?=\s*(?:dollars?|euros?|pounds|bucks)\b)))+)\s*(dollars?|euros?|pounds|bucks)(?:\s+and\s+((?:(?:${NUMWORD})[\s-]+)+)cents?)?`, "gi");
+const WORD_CURRENCY = { dollar: "USD", dollars: "USD", bucks: "USD", euro: "EUR", euros: "EUR", pounds: "GBP" };
+
+/** A number written in English words ("forty-nine", "one hundred twenty", "two thousand"), or null. */
+export function wordsNumber(words) {
+  const parts = String(words ?? "").toLowerCase().split(/[\s-]+/).filter((w) => w && w !== "and");
+  if (!parts.length) return null;
+  let total = 0;
+  let cur = 0;
+  for (const w of parts) {
+    if (w === "a") cur = cur || 1;
+    else if (w in ONES) cur += ONES[w];
+    else if (w in TENS) cur += TENS[w];
+    else if (w === "hundred") cur = (cur || 1) * 100;
+    else if (w in SCALES) {
+      total += (cur || 1) * SCALES[w];
+      cur = 0;
+    } else return null;
+  }
+  return total + cur;
+}
+
+/**
+ * Every locked-type value in a text, as valuesIn reads it, plus money written in words ("forty-nine dollars") and any
+ * number no rule parses (the "60" of "$40-60", a bare figure). `lockedTypes` adds a company's own types:
+ * [{ kind, pattern }], each a RegExp whose matches must appear in the signed record word for word.
+ */
+export function lockedValuesIn(text, lockedTypes = []) {
+  const t = String(text ?? "");
+  const out = valuesIn(t).map((v) => ({ ...v, start: t.indexOf(v.raw) }));
+  const spans = out.map((v) => [v.start, v.start + v.raw.length]);
+  const free = (i, j) => !spans.some(([a, b]) => i < b && j > a);
+  for (const m of t.matchAll(MONEY_WORDS)) {
+    const n = wordsNumber(m[1]);
+    if (n === null) continue;
+    const cents = m[3] ? wordsNumber(m[3]) : 0;
+    const value = cents ? n + cents / 100 : n;
+    out.push({ kind: "money", norm: `${num(value)} ${WORD_CURRENCY[m[2].toLowerCase()] ?? "USD"}`, raw: m[0] });
+    spans.push([m.index, m.index + m[0].length]);
+  }
+  for (const m of t.matchAll(/\d+(?:[.,]\d+)*/g)) {
+    if (!free(m.index, m.index + m[0].length)) continue;
+    out.push({ kind: "number", norm: plainNum(m[0]), raw: m[0] });
+  }
+  for (const lt of lockedTypes ?? []) {
+    const re = new RegExp(lt.pattern.source, lt.pattern.flags.includes("g") ? lt.pattern.flags : `${lt.pattern.flags}g`);
+    for (const m of t.matchAll(re)) out.push({ kind: lt.kind, norm: m[0].toLowerCase(), raw: m[0] });
+  }
+  return out.map(({ start, ...v }) => v);
+}
+
+/** A digit run as one number: a thousands comma dropped, a decimal comma read as a point. */
+const plainNum = (raw) => num(String(raw).replace(/,(?=\d{3}\b)/g, "").replace(/,/g, "."));
+
+const BUILT_IN_KINDS = new Set(["money", "phone", "email", "percent", "counted"]);
+
+function signedText(file) {
+  return (file?.facts ?? []).map((f) => [f.statement, ...(f.conditions ?? []), f.typed?.value ?? "", typeof f.value === "string" || typeof f.value === "number" ? f.value : ""].join(" \n ")).join(" \n ");
+}
+
+/**
+ * The scan of every outgoing sentence. A sentence the code answer or a signed statement gave passes as
+ * it is. Any other sentence that holds a locked-type value the company did not sign (a price in digits, in words or in
+ * a range, a phone, an email, a percent, a count, a company-added type) or a number no rule parses is removed, and the
+ * code answer, else the not-published reply, stands in its place once. Returns { text, removed, ok }.
+ */
+export function guardOutgoing(text, file, opts = {}) {
+  const signed = signedValues(file);
+  const all = signedText(file).toLowerCase();
+  const numbers = new Set([...all.matchAll(/\d+(?:[.,]\d+)*/g)].map((m) => plainNum(m[0])));
+  const statements = new Set((file?.facts ?? []).map((f) => String(f.statement ?? "").trim()));
+  const code = new Set(sentencesOf(opts.codeAnswer ?? ""));
+  const replacement = opts.codeAnswer ?? opts.reply ?? DEFAULT_WHEN_UNKNOWN;
+  const kept = [];
+  const removed = [];
+  let replaced = false;
+  for (const s of sentencesOf(text)) {
+    if (code.has(s) || statements.has(s)) {
+      kept.push(s);
+      continue;
+    }
+    const isSigned = (v) => (v.kind === "number" ? numbers.has(v.norm) : BUILT_IN_KINDS.has(v.kind) ? Boolean(signed.get(v.kind)?.has(v.norm)) : all.includes(v.norm));
+    const bad = lockedValuesIn(s, opts.lockedTypes).filter((v) => !isSigned(v));
+    if (!bad.length) {
+      kept.push(s);
+      continue;
+    }
+    removed.push({ sentence: s, values: bad });
+    if (!replaced) {
+      kept.push(...sentencesOf(replacement));
+      replaced = true;
+    }
+  }
+  return { text: kept.join(" "), removed, ok: removed.length === 0 };
+}
+
+// ------------------------------------------------------------------ values rendered by code in the reader's language
+
+/** The languages values are rendered in, each by one fixed rule (the same table in Python). */
+export const LOCALES = Object.freeze({
+  en: { decimal: ".", group: ",", money: (v, c) => `${SYMBOL[c] ?? `${c} `}${v}`, date: (y, m, d) => `${MONTHS.en[m - 1]} ${d}, ${y}`, translation: "Translation" },
+  es: { decimal: ",", group: ".", money: (v, c) => `${v} ${SYMBOL[c] ?? c}`, date: (y, m, d) => `${d} de ${MONTHS.es[m - 1]} de ${y}`, translation: "Traducción" },
+  fr: { decimal: ",", group: " ", money: (v, c) => `${v} ${SYMBOL[c] ?? c}`, date: (y, m, d) => `${d} ${MONTHS.fr[m - 1]} ${y}`, translation: "Traduction" },
+  de: { decimal: ",", group: ".", money: (v, c) => `${v} ${SYMBOL[c] ?? c}`, date: (y, m, d) => `${d}. ${MONTHS.de[m - 1]} ${y}`, translation: "Übersetzung" },
+  pt: { decimal: ",", group: ".", money: (v, c) => `${SYMBOL[c] ?? c} ${v}`, date: (y, m, d) => `${d} de ${MONTHS.pt[m - 1]} de ${y}`, translation: "Tradução" },
+  it: { decimal: ",", group: ".", money: (v, c) => `${v} ${SYMBOL[c] ?? c}`, date: (y, m, d) => `${d} ${MONTHS.it[m - 1]} ${y}`, translation: "Traduzione" },
+  ja: { decimal: ".", group: ",", money: (v, c) => `${SYMBOL[c] ?? c}${v}`, date: (y, m, d) => `${y}年${m}月${d}日`, translation: "翻訳" },
+  zh: { decimal: ".", group: ",", money: (v, c) => `${SYMBOL[c] ?? c}${v}`, date: (y, m, d) => `${y}年${m}月${d}日`, translation: "翻译" },
+});
+const SYMBOL = { USD: "$", EUR: "€", GBP: "£", JPY: "¥", INR: "₹" };
+const MONTHS = {
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  es: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+  fr: ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+  de: ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+  pt: ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
+  it: ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"],
+};
+
+function groupDigits(int, sep) {
+  return int.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+}
+
+/** A number in a language's separators: "1234.5" in de is "1.234,5". */
+export function renderNumber(value, lang) {
+  const L = LOCALES[lang] ?? LOCALES.en;
+  const [int, frac] = String(value).split(".");
+  return `${groupDigits(int, L.group)}${frac ? `${L.decimal}${frac}` : ""}`;
+}
+
+/**
+ * A typed value rendered by code in `lang`: an amount with its currency, a date, a percent, a duration or number; the
+ * value itself never changes, only how it is written. Returns { text, value, lang } or null for a type with no rule.
+ */
+export function renderValue(typed, lang = "en") {
+  if (!typed || typed.value === undefined || typed.value === null) return null;
+  const L = LOCALES[lang] ?? LOCALES.en;
+  const v = String(typed.value);
+  if (typed.type === "amount" && /^\d+(\.\d+)?$/.test(v)) return { text: L.money(renderNumber(v, lang), typed.currency ?? "USD"), value: v, lang };
+  if (typed.type === "date") {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v);
+    if (m) return { text: L.date(Number(m[1]), Number(m[2]), Number(m[3])), value: v, lang };
+    return { text: v, value: v, lang };
+  }
+  if (typed.type === "percent" && /^\d+(\.\d+)?$/.test(v)) return { text: `${renderNumber(v, lang)}${lang === "fr" || lang === "de" ? " " : ""}%`, value: v, lang };
+  if ((typed.type === "number" || typed.type === "yes_no" || typed.type === "phone" || typed.type === "duration" || typed.type === "named" || typed.type === "url") && v) return { text: typed.type === "number" ? renderNumber(v, lang) : v, value: v, lang };
+  return null;
+}
+
+/**
+ * A value answer in the reader's language: the value rendered by code, then the company's signed sentence word for
+ * word; a sentence given in another language than the signed one is marked as a translation and links to the signed
+ * sentence's check address. The signed value is always the one in the record.
+ */
+export function valueReply(fact, lang = "en", opts = {}) {
+  const r = renderValue(fact?.typed, lang);
+  if (!r) return null;
+  const L = LOCALES[lang] ?? LOCALES.en;
+  const lines = [r.text];
+  if (opts.translated) lines.push(`${L.translation}: ${opts.translated} (${fact.statement}${opts.check ? ` ${opts.check}` : ""})`);
+  else lines.push(`"${fact.statement}"${opts.check ? ` ${opts.check}` : ""}`);
+  return { text: lines.join("\n"), value: r.value, rendered: r.text, lang, translation: Boolean(opts.translated) };
+}
