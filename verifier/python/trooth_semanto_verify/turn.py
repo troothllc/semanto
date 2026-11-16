@@ -500,3 +500,183 @@ def mask_personal(text: Optional[str], file: Optional[dict]) -> str:
         return "[name]"
 
     return _NAME.sub(name, out)
+
+
+# ------------------------------------------------------------------ locked values never come from a model
+
+_ONES = {"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+         "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18, "nineteen": 19}
+_TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
+_SCALES = {"hundred": 100, "thousand": 1000, "million": 1000000}
+_NUMWORD = "|".join([*_ONES, *_TENS, *_SCALES, "a", "and"])
+_MONEY_WORDS = re.compile(r"\b((?:(?:" + _NUMWORD + r")(?:[\s-]+|(?=\s*(?:dollars?|euros?|pounds|bucks)\b)))+)\s*(dollars?|euros?|pounds|bucks)(?:\s+and\s+((?:(?:" + _NUMWORD + r")[\s-]+)+)cents?)?", re.I)
+_WORD_CURRENCY = {"dollar": "USD", "dollars": "USD", "bucks": "USD", "euro": "EUR", "euros": "EUR", "pounds": "GBP"}
+_BUILT_IN_KINDS = {"money", "phone", "email", "percent", "counted"}
+_DIGITS = re.compile(r"\d+(?:[.,]\d+)*")
+
+
+def words_number(words: Optional[str]) -> Optional[int]:
+    """A number written in English words ("forty-nine", "one hundred twenty", "two thousand"), or None."""
+    parts = [w for w in re.split(r"[\s-]+", str(words or "").lower()) if w and w != "and"]
+    if not parts:
+        return None
+    total = cur = 0
+    for w in parts:
+        if w == "a":
+            cur = cur or 1
+        elif w in _ONES:
+            cur += _ONES[w]
+        elif w in _TENS:
+            cur += _TENS[w]
+        elif w == "hundred":
+            cur = (cur or 1) * 100
+        elif w in _SCALES:
+            total += (cur or 1) * _SCALES[w]
+            cur = 0
+        else:
+            return None
+    return total + cur
+
+
+def _plain(s: str) -> str:
+    return _num(re.sub(r",(?=\d{3}\b)", "", s).replace(",", "."))
+
+
+def locked_values_in(text: Optional[str], locked_types: Optional[List[dict]] = None) -> List[dict]:
+    """Every locked-type value in a text: values_in's, money in words, any number no rule parses, and a company's own
+    types ([{"kind", "pattern"}], each a regex whose matches must appear in the signed record word for word)."""
+    t = str(text or "")
+    out = [dict(v) for v in values_in(t)]
+    spans = []
+    for v in out:
+        i = t.find(v["raw"])
+        spans.append((i, i + len(v["raw"])))
+    for m in _MONEY_WORDS.finditer(t):
+        n = words_number(m.group(1))
+        if n is None:
+            continue
+        cents = words_number(m.group(3)) if m.group(3) else 0
+        value = n + cents / 100 if cents else n
+        out.append({"kind": "money", "norm": f"{_num(str(value))} {_WORD_CURRENCY.get(m.group(2).lower(), 'USD')}", "raw": m.group(0)})
+        spans.append((m.start(), m.end()))
+    for m in _DIGITS.finditer(t):
+        if any(m.start() < b and m.end() > a for a, b in spans):
+            continue
+        out.append({"kind": "number", "norm": _plain(m.group(0)), "raw": m.group(0)})
+    for lt in locked_types or []:
+        for m in re.finditer(lt["pattern"], t):
+            out.append({"kind": lt["kind"], "norm": m.group(0).lower(), "raw": m.group(0)})
+    return out
+
+
+def _signed_text(file: Optional[dict]) -> str:
+    parts = []
+    for f in (file or {}).get("facts") or []:
+        v = f.get("value")
+        parts.append(" \n ".join([f.get("statement") or "", *(f.get("conditions") or []), str((f.get("typed") or {}).get("value") or ""), str(v) if isinstance(v, (str, int, float)) and not isinstance(v, bool) else ""]))
+    return " \n ".join(parts)
+
+
+def guard_outgoing(text: str, file: Optional[dict], code_answer: Optional[str] = None, reply: Optional[str] = None, locked_types: Optional[List[dict]] = None) -> dict:
+    """Locked values: every outgoing sentence scanned. A sentence the code answer or a signed statement gave passes; any other
+    sentence holding a locked-type value the company did not sign, or a number no rule parses, is removed, and the code
+    answer, else the not-published reply, stands in its place once."""
+    signed = signed_values(file)
+    allt = _signed_text(file).lower()
+    numbers = {_plain(m.group(0)) for m in _DIGITS.finditer(allt)}
+    statements = {str(f.get("statement") or "").strip() for f in (file or {}).get("facts") or []}
+    code = set(sentences_of(code_answer or ""))
+    replacement = code_answer or reply or DEFAULT_WHEN_UNKNOWN
+    kept: List[str] = []
+    removed: List[dict] = []
+    replaced = False
+
+    def is_signed(v: dict) -> bool:
+        if v["kind"] == "number":
+            return v["norm"] in numbers
+        if v["kind"] in _BUILT_IN_KINDS:
+            return v["norm"] in signed.get(v["kind"], set())
+        return v["norm"] in allt
+
+    for s in sentences_of(text):
+        if s in code or s in statements:
+            kept.append(s)
+            continue
+        bad = [v for v in locked_values_in(s, locked_types) if not is_signed(v)]
+        if not bad:
+            kept.append(s)
+            continue
+        removed.append({"sentence": s, "values": bad})
+        if not replaced:
+            kept.extend(sentences_of(replacement))
+            replaced = True
+    return {"text": " ".join(kept), "removed": removed, "ok": not removed}
+
+
+# ------------------------------------------------------------------ values rendered by code in the reader's language
+
+_SYMBOL = {"USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥", "INR": "₹"}
+_MONTHS = {
+    "en": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    "es": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    "fr": ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+    "de": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "pt": ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"],
+    "it": ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"],
+}
+
+
+def _sym(c: str, sep: str = "") -> str:
+    return _SYMBOL.get(c, c + sep) if sep else _SYMBOL.get(c, c)
+
+
+LOCALES = {
+    "en": {"decimal": ".", "group": ",", "money": lambda v, c: f"{_SYMBOL.get(c, c + ' ')}{v}", "date": lambda y, m, d: f"{_MONTHS['en'][m - 1]} {d}, {y}", "translation": "Translation"},
+    "es": {"decimal": ",", "group": ".", "money": lambda v, c: f"{v} {_sym(c)}", "date": lambda y, m, d: f"{d} de {_MONTHS['es'][m - 1]} de {y}", "translation": "Traducción"},
+    "fr": {"decimal": ",", "group": " ", "money": lambda v, c: f"{v} {_sym(c)}", "date": lambda y, m, d: f"{d} {_MONTHS['fr'][m - 1]} {y}", "translation": "Traduction"},
+    "de": {"decimal": ",", "group": ".", "money": lambda v, c: f"{v} {_sym(c)}", "date": lambda y, m, d: f"{d}. {_MONTHS['de'][m - 1]} {y}", "translation": "Übersetzung"},
+    "pt": {"decimal": ",", "group": ".", "money": lambda v, c: f"{_sym(c)} {v}", "date": lambda y, m, d: f"{d} de {_MONTHS['pt'][m - 1]} de {y}", "translation": "Tradução"},
+    "it": {"decimal": ",", "group": ".", "money": lambda v, c: f"{v} {_sym(c)}", "date": lambda y, m, d: f"{d} {_MONTHS['it'][m - 1]} {y}", "translation": "Traduzione"},
+    "ja": {"decimal": ".", "group": ",", "money": lambda v, c: f"{_sym(c)}{v}", "date": lambda y, m, d: f"{y}年{m}月{d}日", "translation": "翻訳"},
+    "zh": {"decimal": ".", "group": ",", "money": lambda v, c: f"{_sym(c)}{v}", "date": lambda y, m, d: f"{y}年{m}月{d}日", "translation": "翻译"},
+}
+
+
+def render_number(value: Any, lang: str) -> str:
+    """A number in a language's separators: "1234.5" in de is "1.234,5"."""
+    loc = LOCALES.get(lang, LOCALES["en"])
+    s = str(value)
+    whole, _, frac = s.partition(".")
+    whole = re.sub(r"\B(?=(\d{3})+(?!\d))", loc["group"], whole)
+    return f"{whole}{loc['decimal'] + frac if frac else ''}"
+
+
+def render_value(typed: Optional[dict], lang: str = "en") -> Optional[dict]:
+    """A typed value rendered by code in `lang`; the value never changes, only how it is written."""
+    if not typed or typed.get("value") is None:
+        return None
+    loc = LOCALES.get(lang, LOCALES["en"])
+    v = str(typed["value"])
+    t = typed.get("type")
+    if t == "amount" and re.fullmatch(r"\d+(\.\d+)?", v):
+        return {"text": loc["money"](render_number(v, lang), typed.get("currency") or "USD"), "value": v, "lang": lang}
+    if t == "date":
+        m = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", v)
+        return {"text": loc["date"](int(m.group(1)), int(m.group(2)), int(m.group(3))) if m else v, "value": v, "lang": lang}
+    if t == "percent" and re.fullmatch(r"\d+(\.\d+)?", v):
+        return {"text": f"{render_number(v, lang)}{chr(0xa0) if lang in ('fr', 'de') else ''}%", "value": v, "lang": lang}
+    if t in ("number", "yes_no", "phone", "duration", "named", "url") and v:
+        return {"text": render_number(v, lang) if t == "number" else v, "value": v, "lang": lang}
+    return None
+
+
+def value_reply(fact: dict, lang: str = "en", translated: Optional[str] = None, check: Optional[str] = None) -> Optional[dict]:
+    """A value answer in the reader's language: the value rendered by code, then the signed sentence word for word; a
+    sentence in another language is marked as a translation and names the signed sentence and its check address."""
+    r = render_value((fact or {}).get("typed"), lang)
+    if not r:
+        return None
+    loc = LOCALES.get(lang, LOCALES["en"])
+    tail = f" {check}" if check else ""
+    second = f"{loc['translation']}: {translated} ({fact['statement']}{tail})" if translated else f"\"{fact['statement']}\"{tail}"
+    return {"text": f"{r['text']}\n{second}", "value": r["value"], "rendered": r["text"], "lang": lang, "translation": bool(translated)}

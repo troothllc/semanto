@@ -5,6 +5,12 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## 1.6.0 (2026-11-16)
+
+- Locked values never come from a model. `guardOutgoing(text, file, { codeAnswer, reply, lockedTypes })` scans every outgoing sentence: a sentence the code answer or a signed statement gave passes as it is; any other sentence holding a price, phone, email, percent or count the company did not sign (in digits, in words such as "forty-five dollars", or inside a range such as "$40-60"), a number no rule parses, or a value of a type the company added, is removed, and the code answer (or the not-published reply) stands in its place once. `lockedValuesIn` and `wordsNumber` are exported.
+- Values in the reader's language. `renderValue(typed, lang)` writes an amount, date, percent or number by a fixed rule for en, es, fr, de, pt, it, ja and zh (`LOCALES`); the value itself never changes. `valueReply(fact, lang, { translated, check })` gives the rendered value, then the signed sentence word for word, or a sentence in another language marked as a translation and naming the signed sentence and its check address.
+- New shared test vectors in `verifier/test-vectors/locked-v1`: fifty drafts with a wrong price in digits, in words and inside a range, each removed, and twenty value questions in each of the eight languages. The JavaScript and Python kits give the same results.
+
 ## 1.5.1 (2026-11-15)
 
 - Email addresses are found in one pass and trailing question marks are trimmed without a regular expression, so a hostile question of any length is read in linear time (found by CodeQL). Every result is the same.

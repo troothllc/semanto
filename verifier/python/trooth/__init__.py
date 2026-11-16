@@ -14,5 +14,5 @@ kits). Framework integrations are optional extras: trooth[langchain], trooth[lla
 from trooth_semanto_verify.client import SemantoClient
 from trooth_semanto_verify.source import SemantoSource
 
-__version__ = "0.5.1"
+__version__ = "0.6.0"
 __all__ = ["SemantoClient", "SemantoSource", "__version__"]

@@ -76,3 +76,15 @@ export function quoteAnswer(file: object | null, pages: SignedPage[], selection:
 export interface Released { sentence: string; checked_at: number; released_at: number }
 export function releaseChecked(tokens: AsyncIterable<string> | Iterable<string>, check: (s: string) => Promise<boolean> | boolean, opts?: { now?: () => number; recording?: object[] }): AsyncGenerator<Released>;
 export function maskPersonal(text: string, file: object | null): string;
+
+/** a number written in English words, or null. */
+export function wordsNumber(words: string): number | null;
+/** every locked-type value in a text, money in words and unparsed numbers included. */
+export function lockedValuesIn(text: string, lockedTypes?: { kind: string; pattern: RegExp }[]): { kind: string; norm: string; raw: string }[];
+/** remove each outgoing sentence holding a locked value the company did not sign; the code answer or the reply stands in. */
+export function guardOutgoing(text: string, file: object | null, opts?: { codeAnswer?: string; reply?: string; lockedTypes?: { kind: string; pattern: RegExp }[] }): { text: string; removed: { sentence: string; values: { kind: string; norm: string; raw: string }[] }[]; ok: boolean };
+/** the languages values are rendered in. */
+export const LOCALES: Readonly<Record<"en" | "es" | "fr" | "de" | "pt" | "it" | "ja" | "zh", { decimal: string; group: string; translation: string }>>;
+export function renderNumber(value: string | number, lang: string): string;
+export function renderValue(typed: { type: string; value: string; currency?: string } | null | undefined, lang?: string): { text: string; value: string; lang: string } | null;
+export function valueReply(fact: { statement: string; typed?: { type: string; value: string; currency?: string } }, lang?: string, opts?: { translated?: string; check?: string }): { text: string; value: string; rendered: string; lang: string; translation: boolean } | null;
