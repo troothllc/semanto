@@ -352,7 +352,7 @@ export class SemantoSource {
   async quote({ question, select, pages = null }) {
     await this.ensureFresh();
     if (!this.file || this.closed) return customerReply({ status: "not_read", company: this.company, facts: [] }, this.file, { closed: this.file ? this.closed : "not_read", domain: this.domain });
-    // AP75: free-form answers are quoted only while the company's gate G8 pass is on file (free_form "quoted" on the
+    // Free-form answers are quoted only while the company's gate G8 pass is on file (free_form "quoted" on the
     // answer mode); otherwise, and whenever the mode cannot be read, the not-published reply, with no model call.
     if ((await this.answerMode()).free_form !== "quoted") {
       this.log("free_form_off", "Gate G8 has no pass on file for this company, so free-form questions get the not-published reply.");

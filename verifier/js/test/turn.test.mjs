@@ -321,7 +321,7 @@ test("quote-assembled answers print the company's own sentences unchanged and ho
   assert.ok(t.events.some((e) => e.event === "page_unreadable"));
 });
 
-test("AP75: with no gate G8 pass on file, a free-form question gets the not-published reply and the model is not asked", async () => {
+test("With no gate G8 pass on file, a free-form question gets the not-published reply and the model is not asked", async () => {
   for (const freeForm of ["not_published", undefined]) {
     const net = site({ freeForm });
     const s = new SemantoSource("acme.com", { fetch: net.fetch, now: () => NOW });

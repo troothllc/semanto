@@ -407,7 +407,7 @@ def test_languages_values_rendered_by_code_in_each_language_as_the_javascript_ki
         assert got["value"] == r["typed"]["value"]
 
 
-def test_ap75_no_g8_pass_gives_the_not_published_reply_without_asking_the_model():
+def test_no_g8_pass_gives_the_not_published_reply_without_asking_the_model():
     for free_form in ("not_published", None):
         net = Net(free_form=free_form)
         s = SemantoSource("acme.com", fetch=net, now=Clock())

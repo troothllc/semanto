@@ -336,7 +336,7 @@ class SemantoSource:
         self.ensure_fresh()
         if not self.file or self.closed:
             return customer_reply({"status": "not_read", "company": self.company, "facts": []}, self.file, closed=self.closed if self.file else "not_read", domain=self.domain)
-        # AP75: free-form answers are quoted only while the company's gate G8 pass is on file; otherwise the
+        # Free-form answers are quoted only while the company's gate G8 pass is on file; otherwise the
         # not-published reply, with no model call.
         if self.answer_mode().get("free_form") != "quoted":
             self._log("free_form_off", "Gate G8 has no pass on file for this company, so free-form questions get the not-published reply.")
