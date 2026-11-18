@@ -249,12 +249,12 @@ test("the mode is read from Trooth; with Trooth unreachable from the start, Chec
   const net = site();
   net.state.mode = "audit";
   const s = new SemantoSource("acme.com", { fetch: net.fetch, now: () => NOW });
-  assert.deepEqual(await s.answerMode(), { mode: "audit", generated_sentences: false, source: "trooth" });
+  assert.deepEqual(await s.answerMode(), { mode: "audit", generated_sentences: false, free_form: "not_published", source: "trooth" });
   const down = site();
   down.state.apiDown = true;
   const t = new SemantoSource("acme.com", { fetch: async (u) => (u.endsWith("/trooth-keys.json") && u.startsWith("https://api.") ? net.fetch(u) : down.fetch(u)), now: () => NOW });
   const m = await t.answerMode();
-  assert.deepEqual(m, { mode: "checked", generated_sentences: false, source: "fail_closed" });
+  assert.deepEqual(m, { mode: "checked", generated_sentences: false, free_form: "not_published", source: "fail_closed" });
   assert.equal((await t.respond({ question: "How much is the Starter plan?", draft: "1 USD" })).mode, "checked");
 });
 

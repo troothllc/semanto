@@ -177,7 +177,7 @@ function site(state = {}) {
       if (state.apiDown) throw new TypeError("fetch failed");
       if (url.endsWith("/trooth-keys.json")) return json(keys.trooth);
       if (url.endsWith("/facts/marks")) return json({ version: vec.file.header.version, marks: state.marks ?? [] });
-      if (url.endsWith("/answer-mode")) return json({ mode: state.mode ?? "checked", generated_sentences: false });
+      if (url.endsWith("/answer-mode")) return json({ mode: state.mode ?? "checked", generated_sentences: false, ...("freeForm" in state ? (state.freeForm ? { free_form: state.freeForm } : {}) : { free_form: "quoted" }) });
       if (url.endsWith("/revocations")) return state.revocations ? json({ list: state.revocations }) : new Response("{}", { status: 404 });
       const m = /\/pages\/(smp_[a-z0-9]+)$/.exec(url);
       if (m) return new Response(state.pageText?.[m[1]] ?? pages.by_id[m[1]], { status: 200, headers: { "Content-Type": "text/markdown" } });
@@ -319,6 +319,20 @@ test("quote-assembled answers print the company's own sentences unchanged and ho
   const t = new SemantoSource("acme.com", { fetch: tampered.fetch, now: () => NOW });
   assert.equal((await t.pages()).length, 2);
   assert.ok(t.events.some((e) => e.event === "page_unreadable"));
+});
+
+test("With no gate G8 pass on file, a free-form question gets the not-published reply and the model is not asked", async () => {
+  for (const freeForm of ["not_published", undefined]) {
+    const net = site({ freeForm });
+    const s = new SemantoSource("acme.com", { fetch: net.fetch, now: () => NOW });
+    let asked = 0;
+    const q = await s.quote({ question: "How do you protect accounts?", select: async () => (asked++, { runs: [{ from: "smp_mh2iriw5u3rzy53s3mqowrgbh7:2", to: "smp_mh2iriw5u3rzy53s3mqowrgbh7:2" }] }) });
+    assert.equal(q.status, "not_published");
+    assert.equal(q.problem, "gate_g8_not_met");
+    assert.ok(q.text.startsWith("Acme has not published this."));
+    assert.equal(asked, 0);
+    assert.ok(s.events.some((e) => e.event === "free_form_off"));
+  }
 });
 
 // ------------------------------------------------------------------ personal data

@@ -80,7 +80,7 @@ export class SemantoSource {
     s.company = { trooth_id: file.header.trooth_id, org: file.header.org, domain: s.domain };
     s.changed = opts.changed ?? [];
     s.checkedAt = Number.POSITIVE_INFINITY;
-    s.modeSetting = { mode: opts.mode ?? "checked", generated_sentences: false };
+    s.modeSetting = { mode: opts.mode ?? "checked", generated_sentences: false, free_form: "not_published" };
     s.modeReadAt = Number.POSITIVE_INFINITY;
     s.modeFresh = true;
     return s;
@@ -261,14 +261,14 @@ export class SemantoSource {
   /**
    * The company's answer mode, read from Trooth with the marks and kept between reads. When it has never been read
    * (Trooth's API unreachable from the start), Checked is used: the strictest mode, so nothing unchecked is shown.
-   * @returns {Promise<{ mode: "checked" | "source_only" | "audit", generated_sentences: boolean, source: "trooth" | "last_read" | "fail_closed" }>}
+   * @returns {Promise<{ mode: "checked" | "source_only" | "audit", generated_sentences: boolean, free_form: "quoted" | "not_published", source: "trooth" | "last_read" | "fail_closed" }>}
    */
   async answerMode() {
     await this.ensureFresh();
     if (this.file && this.now() - this.modeReadAt >= this.refreshMs) {
       try {
         const m = await this.json(`${this.apiBase}/public/semanto/${encodeURIComponent(this.file.header.trooth_id)}/answer-mode`);
-        if (ANSWER_MODES.includes(m.mode)) this.modeSetting = { mode: m.mode, generated_sentences: m.generated_sentences === true };
+        if (ANSWER_MODES.includes(m.mode)) this.modeSetting = { mode: m.mode, generated_sentences: m.generated_sentences === true, free_form: m.free_form === "quoted" ? "quoted" : "not_published" };
         this.modeReadAt = this.now();
         this.modeFresh = true;
       } catch (e) {
@@ -278,7 +278,7 @@ export class SemantoSource {
       }
     }
     if (this.modeSetting) return { ...this.modeSetting, source: this.modeFresh ? "trooth" : "last_read" };
-    return { mode: "checked", generated_sentences: false, source: "fail_closed" };
+    return { mode: "checked", generated_sentences: false, free_form: "not_published", source: "fail_closed" };
   }
 
   /**
@@ -352,6 +352,12 @@ export class SemantoSource {
   async quote({ question, select, pages = null }) {
     await this.ensureFresh();
     if (!this.file || this.closed) return customerReply({ status: "not_read", company: this.company, facts: [] }, this.file, { closed: this.file ? this.closed : "not_read", domain: this.domain });
+    // Free-form answers are quoted only while the company's gate G8 pass is on file (free_form "quoted" on the
+    // answer mode); otherwise, and whenever the mode cannot be read, the not-published reply, with no model call.
+    if ((await this.answerMode()).free_form !== "quoted") {
+      this.log("free_form_off", "Gate G8 has no pass on file for this company, so free-form questions get the not-published reply.");
+      return { ...quoteAnswer(this.file, [], null, { org: this.company.org, domain: this.domain }), problem: "gate_g8_not_met" };
+    }
     const signedPages = pages ?? (await this.pages());
     const sentences = signedPages.flatMap((p) => pageSentences(p));
     let selection = null;

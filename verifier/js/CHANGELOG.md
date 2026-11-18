@@ -5,6 +5,10 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+## Unreleased
+
+- Gate G8 before free-form quoting. `SemantoSource.quote` quotes the company's pages only while the answer mode says `free_form: "quoted"`, which Trooth gives once the company's gate G8 pass is on file; otherwise, and whenever the answer mode cannot be read, it gives the not-published reply with `problem: "gate_g8_not_met"` and does not ask the model. `answerMode()` / `answer_mode()` now carries `free_form`.
+
 ## 1.6.0 (2026-11-16)
 
 - Locked values never come from a model. `guardOutgoing(text, file, { codeAnswer, reply, lockedTypes })` scans every outgoing sentence: a sentence the code answer or a signed statement gave passes as it is; any other sentence holding a price, phone, email, percent or count the company did not sign (in digits, in words such as "forty-five dollars", or inside a range such as "$40-60"), a number no rule parses, or a value of a type the company added, is removed, and the code answer (or the not-published reply) stands in its place once. `lockedValuesIn` and `wordsNumber` are exported.
