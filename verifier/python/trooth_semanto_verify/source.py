@@ -91,7 +91,7 @@ class SemantoSource:
         s.company = {"trooth_id": h["trooth_id"], "org": h["org"], "domain": s.domain}
         s.changed = list(changed or [])
         s.checked_at = float("inf")
-        s._mode = {"mode": mode, "generated_sentences": False}
+        s._mode = {"mode": mode, "generated_sentences": False, "free_form": "not_published"}
         s._mode_read_at = float("inf")
         s._mode_fresh = True
         return s
@@ -262,7 +262,7 @@ class SemantoSource:
             try:
                 m = self._json(f"{self.api_base}/public/semanto/{tid}/answer-mode")
                 if m.get("mode") in ANSWER_MODES:
-                    self._mode = {"mode": m["mode"], "generated_sentences": m.get("generated_sentences") is True}
+                    self._mode = {"mode": m["mode"], "generated_sentences": m.get("generated_sentences") is True, "free_form": "quoted" if m.get("free_form") == "quoted" else "not_published"}
                 self._mode_fresh = True
             except Exception as e:  # noqa: BLE001
                 self._mode_fresh = False
@@ -270,7 +270,7 @@ class SemantoSource:
             self._mode_read_at = self.now()
         if self._mode:
             return {**self._mode, "source": "trooth" if self._mode_fresh else "last_read"}
-        return {"mode": "checked", "generated_sentences": False, "source": "fail_closed"}
+        return {"mode": "checked", "generated_sentences": False, "free_form": "not_published", "source": "fail_closed"}
 
     def respond(self, question: Optional[str] = None, draft: str = "", fact_id: Optional[str] = None, mode: Optional[str] = None,
                 history: Optional[List[str]] = None) -> dict:
@@ -336,6 +336,11 @@ class SemantoSource:
         self.ensure_fresh()
         if not self.file or self.closed:
             return customer_reply({"status": "not_read", "company": self.company, "facts": []}, self.file, closed=self.closed if self.file else "not_read", domain=self.domain)
+        # AP75: free-form answers are quoted only while the company's gate G8 pass is on file; otherwise the
+        # not-published reply, with no model call.
+        if self.answer_mode().get("free_form") != "quoted":
+            self._log("free_form_off", "Gate G8 has no pass on file for this company, so free-form questions get the not-published reply.")
+            return {**quote_answer(self.file, [], None, org=self.company["org"], domain=self.domain), "problem": "gate_g8_not_met"}
         signed_pages = pages if pages is not None else self.pages()
         sentences = [s for p in signed_pages for s in page_sentences(p)]
         try:

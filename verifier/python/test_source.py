@@ -215,12 +215,12 @@ def test_respond_follows_the_mode():
 def test_mode_fails_closed_to_checked_when_trooth_is_unreachable():
     net = Net()
     net.mode = "audit"
-    assert SemantoSource("acme.com", fetch=net, now=Clock()).answer_mode() == {"mode": "audit", "generated_sentences": False, "source": "trooth"}
+    assert SemantoSource("acme.com", fetch=net, now=Clock()).answer_mode() == {"mode": "audit", "generated_sentences": False, "free_form": "not_published", "source": "trooth"}
 
     def fetch(u, h):
         if u.startswith("https://api.trooth.co/") and not u.endswith("/trooth-keys.json"):
             raise OSError("blocked")
         return net(u, h)
     s = SemantoSource("acme.com", fetch=fetch, now=Clock())
-    assert s.answer_mode() == {"mode": "checked", "generated_sentences": False, "source": "fail_closed"}
+    assert s.answer_mode() == {"mode": "checked", "generated_sentences": False, "free_form": "not_published", "source": "fail_closed"}
     assert s.respond(question="How much is the Starter plan?", draft="1 USD")["mode"] == "checked"

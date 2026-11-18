@@ -140,7 +140,7 @@ class Net:
             if url.endswith("/facts/marks"):
                 return ok({"version": VEC["file"]["header"]["version"], "marks": s.get("marks", [])})
             if url.endswith("/answer-mode"):
-                return ok({"mode": s.get("mode", "checked"), "generated_sentences": False})
+                return ok({"mode": s.get("mode", "checked"), "generated_sentences": False, **({"free_form": s["free_form"]} if s.get("free_form") else {} if "free_form" in s else {"free_form": "quoted"})})
             if url.endswith("/revocations"):
                 return ok({"list": s["revocations"]}) if s.get("revocations") else (404, {}, b"{}")
             m = re.search(r"/pages/(smp_[a-z0-9]+)$", url)
@@ -405,3 +405,15 @@ def test_languages_values_rendered_by_code_in_each_language_as_the_javascript_ki
         got = value_reply({"statement": r["statement"], "typed": r["typed"]}, r["lang"], translated=r.get("translated"), check=r.get("check"))
         assert got == r["reply"], (r["lang"], r["typed"])
         assert got["value"] == r["typed"]["value"]
+
+
+def test_ap75_no_g8_pass_gives_the_not_published_reply_without_asking_the_model():
+    for free_form in ("not_published", None):
+        net = Net(free_form=free_form)
+        s = SemantoSource("acme.com", fetch=net, now=Clock())
+        asked = []
+        q = s.quote("How do you protect accounts?", lambda question, sentences: (asked.append(1), {"runs": [{"from": "smp_mh2iriw5u3rzy53s3mqowrgbh7:2", "to": "smp_mh2iriw5u3rzy53s3mqowrgbh7:2"}]})[1])
+        assert q["status"] == "not_published"
+        assert q["problem"] == "gate_g8_not_met"
+        assert q["text"].startswith("Acme has not published this.")
+        assert asked == []

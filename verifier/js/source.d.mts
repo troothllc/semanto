@@ -49,7 +49,7 @@ export class SemantoSource {
   /** The reply a customer sees for one turn, built by code; the model's draft is discarded. Fails closed. */
   reply(input: { fact_id?: string; question?: string; draft?: string; history?: string[]; confirmed?: boolean }): Promise<CustomerReply>;
   /** The company's answer mode; Checked when it has never been read. */
-  answerMode(): Promise<{ mode: AnswerMode; generated_sentences: boolean; source: "trooth" | "last_read" | "fail_closed" }>;
+  answerMode(): Promise<{ mode: AnswerMode; generated_sentences: boolean; free_form: "quoted" | "not_published"; source: "trooth" | "last_read" | "fail_closed" }>;
   /** The reply a chatbot sends, in the company's mode or the one given. */
   respond(input: { fact_id?: string; question?: string; draft?: string; mode?: AnswerMode; history?: string[] }): Promise<Responded>;
   /** The output step on an agent's final answer. */
