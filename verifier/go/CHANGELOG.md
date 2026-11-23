@@ -5,6 +5,12 @@
 
 Every change to this reader, newest first. The three readers (JavaScript, Python, Go) run the same shared test vectors in `verifier/test-vectors/v1`, so a change lands in all three together.
 
+
+## Unreleased
+
+- A Signature-Input parameter whose value is a lone quote reads as an empty value, as in the Python reader; it used to panic.
+- A tree size below zero is refused at once by the consistency check; a negative size could make the check loop forever.
+
 ## v0.1.0 (2026-11-15)
 
 The first tagged version.

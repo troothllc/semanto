@@ -265,7 +265,8 @@ export async function verifyInclusion(leaf, index, size, proof, expectedRoot) {
 
 /** RFC 6962 2.1.4.2: the old tree is a prefix of the new tree. */
 export async function verifyConsistencyProof(oldSize, newSize, oldRoot, newRoot, proof) {
-  if (oldSize > newSize) return false;
+  // A tree size is a whole number that is never negative; anything else would shift forever below.
+  if (!Number.isInteger(oldSize) || !Number.isInteger(newSize) || oldSize < 0 || newSize < 0 || oldSize > newSize) return false;
   if (oldSize === newSize) return proof.length === 0 && bytesEqual(oldRoot, newRoot);
   if (oldSize === 0) return proof.length === 0;
   const isPow2 = (oldSize & (oldSize - 1)) === 0;

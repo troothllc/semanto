@@ -101,7 +101,8 @@ func VerifyInclusion(leaf []byte, index, size int, proof [][]byte, expectedRoot 
 
 // VerifyConsistencyProof shows the old tree is a prefix of the new tree.
 func VerifyConsistencyProof(oldSize, newSize int, oldRoot, newRoot []byte, proof [][]byte) bool {
-	if oldSize > newSize {
+	// A tree size is never negative; a negative one would shift forever below.
+	if oldSize < 0 || newSize < 0 || oldSize > newSize {
 		return false
 	}
 	if oldSize == newSize {

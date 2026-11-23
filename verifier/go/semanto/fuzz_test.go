@@ -62,6 +62,8 @@ func FuzzParseSignatureHeaders(f *testing.F) {
 	f.Add(`sig1=("@status" "content-type" "content-digest");created=1729598400;keyid="abc";alg="ed25519";tag="trooth-semanto"`, `sig1=:AAAA:`)
 	f.Add(`sig1=();created=-1`, `sig1=:%%%:`)
 	f.Add(``, ``)
+	// A parameter whose value is a lone quote once panicked (slice bounds out of range [1:0]).
+	f.Add(`sig1=("@status");created=1729598400;keyid="abc";tag="`, ``)
 	f.Fuzz(func(t *testing.T, input, sig string) {
 		_ = ParseSignatureInput(input)
 		_ = ParseSignature(sig)

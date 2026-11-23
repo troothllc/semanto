@@ -179,3 +179,11 @@ def test_web_bot_auth_refuses_a_second_label() -> None:
     v = read("negative/web-bot-auth-two-labels.json")
     r = v["request"]
     assert V.verify_web_bot_auth_request(r["method"], r["url"], r["headers"], KEYS, now=v["now_epoch"])["reason"] == "more_than_one_label"
+
+
+def test_consistency_refuses_negative_sizes():
+    from trooth_semanto_verify.merkle import verify_consistency as consistency
+
+    proof = [bytes(32), bytes(32)]
+    assert consistency(-32, -22, b"0", b"0", proof) is False
+    assert consistency(-1, 5, bytes(32), bytes(32), proof) is False

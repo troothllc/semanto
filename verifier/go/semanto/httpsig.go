@@ -98,7 +98,12 @@ func ParseSignatureInput(value string) map[string]sigInput {
 		for _, pm := range paramRe.FindAllStringSubmatch(paramsRaw, -1) {
 			k, v := pm[1], pm[2]
 			if strings.HasPrefix(v, `"`) {
-				v = unescRe.ReplaceAllString(v[1:len(v)-1], "$1")
+				// A lone quote is an empty value, as the Python verifier reads it (v[1:-1]); slicing it would panic.
+				if len(v) >= 2 {
+					v = unescRe.ReplaceAllString(v[1:len(v)-1], "$1")
+				} else {
+					v = ""
+				}
 			}
 			switch k {
 			case "created":
