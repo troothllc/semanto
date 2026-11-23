@@ -7,6 +7,7 @@ Every change to this reader, newest first. The three readers (JavaScript, Python
 
 ## Unreleased
 
+- A tree size below zero is refused at once by the consistency check; a negative size could make the check loop forever.
 - Gate G8 before free-form quoting. `SemantoSource.quote` quotes the company's pages only while the answer mode says `free_form: "quoted"`, which Trooth gives once the company's gate G8 pass is on file; otherwise, and whenever the answer mode cannot be read, it gives the not-published reply with `problem: "gate_g8_not_met"` and does not ask the model. `answerMode()` / `answer_mode()` now carries `free_form`.
 
 ## 0.6.0 (2026-11-16)

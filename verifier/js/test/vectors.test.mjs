@@ -73,3 +73,10 @@ test("the manifest lists every vector on disk", () => {
   const onDisk = [...readdirSync(DIR).filter((f) => f.endsWith(".json")), ...readdirSync(join(DIR, "negative")).map((f) => `negative/${f}`)].filter((f) => f !== "manifest.json");
   assert.deepEqual(onDisk.sort(), [...manifest.files].sort());
 });
+
+test("negative or fractional tree sizes are refused at once (they once looped forever)", async () => {
+  const proof = [new Uint8Array(32), new Uint8Array(32)];
+  assert.equal(await V.verifyConsistencyProof(-32, -22, new Uint8Array([48]), new Uint8Array([48]), proof), false);
+  assert.equal(await V.verifyConsistencyProof(-1, 5, new Uint8Array(32), new Uint8Array(32), proof), false);
+  assert.equal(await V.verifyConsistencyProof(1.5, 4, new Uint8Array(32), new Uint8Array(32), proof), false);
+});

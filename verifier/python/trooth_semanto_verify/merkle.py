@@ -79,7 +79,8 @@ def verify_inclusion(leaf: bytes, index: int, size: int, proof: Sequence[bytes],
 
 def verify_consistency(old_size: int, new_size: int, old_root: bytes, new_root: bytes, proof: Sequence[bytes]) -> bool:
     """RFC 6962 2.1.4.2: the old tree is a prefix of the new tree."""
-    if old_size > new_size:
+    # A tree size is never negative.
+    if old_size < 0 or new_size < 0 or old_size > new_size:
         return False
     if old_size == new_size:
         return len(proof) == 0 and old_root == new_root
